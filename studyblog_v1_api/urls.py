@@ -1,6 +1,6 @@
-from django.contrib import admin
 from django.urls import path
+import studyblog_v1_api.views as views
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
+    path("test", views.TestApiView.as_view())
 ]
