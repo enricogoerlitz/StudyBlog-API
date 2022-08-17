@@ -12,7 +12,7 @@ class ValidDataWrapper:
         self.errors = error_msg
 
 
-def get_query_id_obj(model, Serializer, auto_exe=True):
+def get_id_obj(model, Serializer, auto_exe=True):
     """
     Checks, whether an id was passed the a get request.
 

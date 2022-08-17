@@ -5,7 +5,7 @@ from rest_framework import status
 
 from studyblog_v1_api.serializers import RoleSerializer
 from studyblog_v1_api.models.RoleModel import *
-from studyblog_v1_api.utils.request import get_query_id_obj
+from studyblog_v1_api.utils.request import get_id_obj
 
 
 class RoleApiView(APIView):
@@ -19,7 +19,7 @@ class RoleApiView(APIView):
         except Exception as _:
             return (id, None)
 
-    @get_query_id_obj(RoleModel, RoleSerializer)
+    @get_id_obj(RoleModel, RoleSerializer)
     def get(self, request, format=None):
         roles = self._serialize(RoleModel.objects.all(), many=True)
         return Response(roles)
