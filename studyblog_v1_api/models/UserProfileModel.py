@@ -2,6 +2,12 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 
 
+DB_FIELD_USERNAME = "username"
+DB_FIELD_PASSWORD = "password"
+DB_FIELD_IS_STUFF = "is_stuff"
+DB_FIELD_IS_SUPERUSER = "is_superuser"
+
+
 class UserProfileManager(BaseUserManager):
     """Manager for user profiles"""
 
@@ -29,7 +35,8 @@ class UserProfileManager(BaseUserManager):
 
         return user
 
-class UserProfile(AbstractBaseUser, PermissionsMixin):
+
+class UserProfileModel(AbstractBaseUser, PermissionsMixin):
     """Database model for users in the system"""
     username = models.CharField(max_length=30, unique=True)
     

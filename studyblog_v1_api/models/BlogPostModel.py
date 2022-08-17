@@ -2,7 +2,14 @@ from django.db import models
 from django.conf import settings
 
 
-class BlogPost(models.Model):
+DB_FIELD_USER_ID = "user_id"
+DB_FIELD_TITLE = "title"
+DB_FIELD_CONTENT = "content"
+DB_FIELD_CREATED = "created"
+DB_FIELD_LAST_EDIT = "last_edit"
+
+
+class BlogPostModel(models.Model):
     """DB Model for storing blogposts of users"""
 
     user = models.ForeignKey(

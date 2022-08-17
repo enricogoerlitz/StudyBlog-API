@@ -1,18 +1,22 @@
 from django.db import models
-from studyblog_v1_api.models import UserProfile, Role
+from studyblog_v1_api.models import UserProfileModel, RoleModel
 
 
-class UserRole(models.Model):
+DB_FIELD_USER_ID = "user_id"
+DB_FIELD_ROLE_ID = "role_id"
+
+
+class UserRoleModel(models.Model):
     """DB Model for connecting User and their roles"""
 
     user = models.ForeignKey(
-        to=UserProfile,
+        to=UserProfileModel,
         on_delete=models.CASCADE,
         null=False
     )
 
     role = models.ForeignKey(
-        to=Role,
+        to=RoleModel,
         on_delete=models.CASCADE,
         null=False
     )

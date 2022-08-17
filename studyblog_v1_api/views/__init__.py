@@ -1,1 +1,2 @@
-from .api_tests.TestApiView import TestApiView
+from .api_tests.views import TestApiView
+from .authentication.views import UserProfileViewSet, ProfileLoginApiView

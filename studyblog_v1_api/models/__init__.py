@@ -1,5 +1,7 @@
-from .UserProfile import UserProfile, UserProfileManager
-from .BlogPost import BlogPost
-from .BlogPostComment import BlogPostComment
-from .Role import Role
-from .UserRole import UserRole
+# mypy: ignore-errors
+
+from .UserProfileModel import *
+from .BlogPostModel import *
+from .BlogPostCommentModel import *
+from .RoleModel import *
+from .UserRoleModel import *
