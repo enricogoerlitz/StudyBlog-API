@@ -14,8 +14,7 @@ class UserProfileViewSet(ModelViewSet):
     queryset = UserProfileModel.objects.all()
     authentication_classes = (TokenAuthentication,)
     filter_backends = (SearchFilter,)
-    search_fields = (DB_FIELD_USERNAME,) # http://127.0.0.1:8000/api/profile/?search=gma&search=ted
-
+    search_fields = (DB_FIELD_USERNAME,)
 
 
 class ProfileLoginApiView(ObtainAuthToken):

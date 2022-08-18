@@ -12,13 +12,15 @@ class UserRoleModel(models.Model):
     user = models.ForeignKey(
         to=UserProfileModel,
         on_delete=models.CASCADE,
-        null=False
+        null=False,
+        blank=False
     )
 
     role = models.ForeignKey(
         to=RoleModel,
         on_delete=models.CASCADE,
-        null=False
+        null=False,
+        blank=False
     )
 
     def __str__(self):

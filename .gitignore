@@ -5,6 +5,8 @@
 django_cmds.txt
 setup.txt
 migrations
+example_*
+test.ipynb
 
 #env
 
