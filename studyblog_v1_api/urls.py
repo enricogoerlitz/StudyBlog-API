@@ -8,6 +8,8 @@ router = DefaultRouter()
 router.register("user", views.UserViewSet)
 router.register("role", views.RoleViewSet)
 router.register("userrole", views.UserRoleViewSet)
+router.register("blogpost", views.BlogPostViewSet)
+router.register("blogpost-comment", views.BlogPostCommentViewSet)
 
 
 urlpatterns = [

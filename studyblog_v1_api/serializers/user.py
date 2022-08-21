@@ -3,12 +3,9 @@ from studyblog_v1_api.models import (
     UserProfileModel,
     RoleModel,
     UserRoleModel,
-    DB_FIELD_ID,
+    DB_FIELD_ALL,
     DB_FIELD_USERNAME,
     DB_FIELD_PASSWORD,
-    DB_FIELD_USER_ID,
-    DB_FIELD_ROLE_ID,
-    DB_FIELD_ROLE_NAME,
 )
 
 
@@ -17,7 +14,7 @@ class UserProfileSerializer(ModelSerializer):
 
     class Meta:
         model = UserProfileModel
-        fields = (DB_FIELD_ID, DB_FIELD_USERNAME, DB_FIELD_PASSWORD)
+        fields = DB_FIELD_ALL
         extra_kwargs = {
             DB_FIELD_PASSWORD: {
                 "write_only": True,
@@ -45,7 +42,7 @@ class RoleSerializer(ModelSerializer):
 
     class Meta:
         model = RoleModel
-        fields = ("id", DB_FIELD_ROLE_NAME)
+        fields = DB_FIELD_ALL
 
 
 class UserRoleSerializer(ModelSerializer):
@@ -53,4 +50,4 @@ class UserRoleSerializer(ModelSerializer):
 
     class Meta:
         model = UserRoleModel
-        fields = (DB_FIELD_ID, DB_FIELD_ROLE_ID, DB_FIELD_USER_ID)
+        fields = DB_FIELD_ALL

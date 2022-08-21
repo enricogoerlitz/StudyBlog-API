@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.db import models
 from django.conf import settings
 
@@ -12,8 +13,8 @@ class BlogPostModel(models.Model):
     )
     title = models.CharField(max_length=50, blank=False, unique=True)
     content = models.CharField(max_length=2000, blank=False)
-    created = models.DateTimeField(auto_now=True)
-    last_edit = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(default=datetime.now, null=False)
+    last_edit = models.DateTimeField(auto_now=True, null=False)
 
     def __str__(self):
         """returns model as string"""
@@ -39,7 +40,7 @@ class BlogPostCommentModel(models.Model):
         null=True
     )
     content = models.CharField(max_length=500, blank=False)
-    created = models.DateTimeField(auto_now=True, null=False)
+    created = models.DateTimeField(default=datetime.now, null=False)
     last_edit = models.DateTimeField(auto_now=True, null=False)
 
     def __str__(self):

@@ -19,6 +19,7 @@ from studyblog_v1_api.models import (
     DB_FIELD_USERNAME,
     DB_FIELD_USER_ID,
     DB_FIELD_ROLE_ID,
+    DB_FIELD_ROLE_NAME,
 )
 from studyblog_v1_api.serializers import (
     UserProfileSerializer,
@@ -39,12 +40,12 @@ class UserViewSet(ModelViewSet):
         """
            /api/v1/profile/?details=true&user_id=1,2,4
         """
-        is_details = request.query_params.get("details")
+        details = request.query_params.get("details")
         user_ids = request.query_params.get("user_id")
         if user_ids:
             user_ids = user_ids.split(",")
 
-        if is_details and is_details.lower() == "true":
+        if details and details.lower() == "true":
             # error handling -> bei failing id finding!!!
             # + username!
             return Response(query.execute(query.fetch_all_user_details(user_id=user_ids)))
@@ -65,8 +66,6 @@ class UserAuthTokenApiView(ObtainAuthToken):
     renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
 
 
-
-
 class RoleViewSet(ModelViewSet):
     """TODO: add description"""
     #authentication_classes = (TokenAuthentication, )
@@ -76,6 +75,8 @@ class RoleViewSet(ModelViewSet):
     #     permissions.UpdateOwnFeedItem,
     #     IsAuthenticated
     # )
+    # filter_backends = (SearchFilter,)
+    # search_fields = (DB_FIELD_ROLE_NAME,)
 
 
 class UserRoleViewSet(ModelViewSet):
