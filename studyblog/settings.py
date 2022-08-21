@@ -16,7 +16,7 @@ SECRET_KEY = "django-insecure-u*_^8jwgoc#dxcrhg22o-)u-!6pj(nm6b8i_0vmx+pvp=_k5_t
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
+CORS_ORIGIN_WHITELIST = []
 
 # Application definition
 
@@ -41,6 +41,13 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+# add local react app
+if DEBUG:
+    ALLOWED_HOSTS.append("localhost")
+    CORS_ORIGIN_WHITELIST.append("http://localhost:3000")
+    INSTALLED_APPS.append("corsheaders")
+    MIDDLEWARE.append("corsheaders.middleware.CorsMiddleware")
 
 ROOT_URLCONF = "studyblog.urls"
 

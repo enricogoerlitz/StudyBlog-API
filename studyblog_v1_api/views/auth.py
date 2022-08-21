@@ -1,16 +1,67 @@
-"""Handles user routes like role, userrole, and user details"""
+""""""
 
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
-from rest_framework.authentication import TokenAuthentication
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.settings import api_settings
 from rest_framework import status
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
 
-from studyblog_v1_api.serializers import RoleSerializer
-from studyblog_v1_api.serializers.UserRoleSerializer import UserRoleSerializer
-from studyblog_v1_api.models.RoleModel import RoleModel
-from studyblog_v1_api.models.UserRoleModel import UserRoleModel, DB_FIELD_ROLE_ID, DB_FIELD_USER_ID
+from studyblog_v1_api.serializers import UserProfileSerializer
 from studyblog_v1_api.utils import response as res
+from studyblog_v1_api.db import query
+from studyblog_v1_api.models import (
+    UserProfileModel,
+    UserRoleModel,
+    RoleModel,
+    DB_FIELD_USERNAME,
+    DB_FIELD_USER_ID,
+    DB_FIELD_ROLE_ID,
+)
+from studyblog_v1_api.serializers import (
+    UserProfileSerializer,
+    UserRoleSerializer,
+    RoleSerializer
+)
+
+
+class UserProfileViewSet(ModelViewSet):
+    """Handle creating, updating and filtering profiles"""
+    serializer_class = UserProfileSerializer
+    queryset = UserProfileModel.objects.all()
+    authentication_classes = (TokenAuthentication,)
+    filter_backends = (SearchFilter,)
+    search_fields = (DB_FIELD_USERNAME,)
+
+    def list(self, request, *args, **kwargs):
+        """
+           /api/v1/profile/?details=true&user_id=1,2,4
+        """
+        is_details = request.query_params.get("details")
+        user_ids = request.query_params.get("user_id")
+        if user_ids:
+            user_ids = user_ids.split(",")
+
+        if is_details and is_details.lower() == "true":
+            # error handling -> bei failing id finding!!!
+            return Response(query.execute(query.fetch_all_user_details(user_id=user_ids)))
+
+        if user_ids:
+            users = UserProfileModel.objects.filter(id__in=user_ids)
+            users = UserProfileSerializer(users, many=True).data
+            if len(users) == 0:
+                return res.error_400_bad_request(f"No user with the ids {user_ids} found!")
+            return Response(users)
+
+        return super().list(request, *args, **kwargs)
+
+class ProfileLoginApiView(ObtainAuthToken):
+    """API-Endpoint for receiving authentication token"""
+    renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
+
+
 
 
 class RoleViewSet(ModelViewSet):

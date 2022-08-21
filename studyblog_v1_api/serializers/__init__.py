@@ -1,4 +1,4 @@
 # mypy: ignore-errors
 
-from .UserProfileSerializer import *
-from .RoleSerializer import *
+from .blogposts import *
+from .users import *

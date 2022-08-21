@@ -8,7 +8,6 @@ router = DefaultRouter()
 router.register("profile", views.UserProfileViewSet)
 router.register("role", views.RoleViewSet)
 router.register("userrole", views.UserRoleViewSet)
-router.register("admin/user", views.UserProfileAdminManipulationRoute)
 
 
 urlpatterns = [

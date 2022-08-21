@@ -1,15 +1,56 @@
-""""""
+from rest_framework.serializers import ModelSerializer
+from studyblog_v1_api.models import (
+    UserProfileModel,
+    RoleModel,
+    UserRoleModel,
+    DB_FIELD_ID,
+    DB_FIELD_USERNAME,
+    DB_FIELD_PASSWORD,
+    DB_FIELD_USER_ID,
+    DB_FIELD_ROLE_ID,
+    DB_FIELD_ROLE_NAME,
+)
 
-from rest_framework import serializers
 
-class UserProfileDetailsSerializer(serializers.Serializer):
-    
+class UserProfileSerializer(ModelSerializer):
+    """Serializes a user profile object"""
+
     class Meta:
-        id = serializers.IntegerField()
-        user_id = serializers.IntegerField()
-        username = serializers.CharField()
-        role_id = serializers.IntegerField()
-        role_name = serializers.CharField()
-        #fields = ("id", "user_id", "username", "role_id", "role_name")
-        #"ur.id, ur.user_id, u.username, ur.role_id, r.role_name"
-        #create_db_table = False
+        model = UserProfileModel
+        fields = (DB_FIELD_ID, DB_FIELD_USERNAME, DB_FIELD_PASSWORD)
+        extra_kwargs = {
+            DB_FIELD_PASSWORD: {
+                "write_only": True,
+                "style": {"input_type": "password"},
+            }
+        }
+
+    def create(self, validated_data):
+        """Handle creating a new user"""
+        return UserProfileModel.objects.create_user(
+            username=validated_data.get(DB_FIELD_USERNAME),
+            password=validated_data.get(DB_FIELD_PASSWORD),
+        )
+    
+    def update(self, instance, validated_data):
+        """Handle updating an user"""
+        if DB_FIELD_PASSWORD in validated_data:
+            instance.set_password(validated_data.pop(DB_FIELD_PASSWORD))
+        
+        return super().update(instance, validated_data)
+
+
+class RoleSerializer(ModelSerializer):
+    """Serialize Roles"""
+
+    class Meta:
+        model = RoleModel
+        fields = ("id", DB_FIELD_ROLE_NAME)
+
+
+class UserRoleSerializer(ModelSerializer):
+    """Serialize an UserRoleModel"""
+
+    class Meta:
+        model = UserRoleModel
+        fields = (DB_FIELD_ID, DB_FIELD_ROLE_ID, DB_FIELD_USER_ID)

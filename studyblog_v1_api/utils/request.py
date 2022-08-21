@@ -46,4 +46,11 @@ def get_id_obj(model, Serializer, auto_exe=True):
     return decorator
 
 def is_in_role(model, serializer, role): 
-    pass    
+    # implement this in the permissions!
+    pass
+
+def validate_composite_primary_keys(keys, table):
+    # extract keys values form query_params with the 'keys' above given
+    # arr = ["user_id", "role_id"] -> in func query_params -> d = {column: request.query_params.get(columns) for column in arr}
+    # Model.objects.filter(**d).count() > 0 -> return error-response
+    pass

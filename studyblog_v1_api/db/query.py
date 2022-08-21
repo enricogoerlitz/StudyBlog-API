@@ -1,7 +1,8 @@
+from typing import Any
 from django.db import connection
 
 
-def execute(query, *args, **kwargs):
+def execute(query, *args, **kwargs) -> list[dict[str, Any]]:
     cursor = connection.cursor()
     result = cursor.execute(query, *args, **kwargs)
     return serialize_query(cursor, result)
@@ -23,7 +24,7 @@ base_user_details_query = """
         studyblog_v1_api_userprofilemodel u ON u.id = ur.user_id
 """
 
-def fetch_all_user_details(user_id=None):
+def fetch_all_user_details(user_id=None) -> str:
     if isinstance(user_id, int):
         single_user_query = f"{base_user_details_query} WHERE ur.user_id = {user_id}"
         return single_user_query

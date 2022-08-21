@@ -1,3 +1,2 @@
-from .api_test.views import TestApiView
-from .authentication.views import UserProfileViewSet, ProfileLoginApiView, UserProfileAdminManipulationRoute
-from .user.views import RoleViewSet, UserRoleViewSet
+from .api_test import TestApiView
+from .auth import UserProfileViewSet, ProfileLoginApiView, RoleViewSet, UserRoleViewSet
