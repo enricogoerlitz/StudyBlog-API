@@ -1,4 +1,4 @@
 # mypy: ignore-errors
 
-from .blogposts import *
-from .users import *
+from .blogpost import *
+from .user import *

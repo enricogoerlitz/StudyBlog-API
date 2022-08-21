@@ -27,7 +27,7 @@ from studyblog_v1_api.serializers import (
 )
 
 
-class UserProfileViewSet(ModelViewSet):
+class UserViewSet(ModelViewSet):
     """Handle creating, updating and filtering profiles"""
     serializer_class = UserProfileSerializer
     queryset = UserProfileModel.objects.all()
@@ -46,6 +46,7 @@ class UserProfileViewSet(ModelViewSet):
 
         if is_details and is_details.lower() == "true":
             # error handling -> bei failing id finding!!!
+            # + username!
             return Response(query.execute(query.fetch_all_user_details(user_id=user_ids)))
 
         if user_ids:
@@ -54,10 +55,12 @@ class UserProfileViewSet(ModelViewSet):
             if len(users) == 0:
                 return res.error_400_bad_request(f"No user with the ids {user_ids} found!")
             return Response(users)
+        
+        # + username!
 
         return super().list(request, *args, **kwargs)
 
-class ProfileLoginApiView(ObtainAuthToken):
+class UserAuthTokenApiView(ObtainAuthToken):
     """API-Endpoint for receiving authentication token"""
     renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
 
@@ -171,20 +174,3 @@ class UserRoleViewSet(ModelViewSet):
             return Response(curr_user_role.values()[0])
         except Exception as exp:
             return res.error_500_internal_server_error(exp)
-
-
-class UserDetails(APIView):
-    """TODO: add description"""
-
-    def get(self, request, *args, **kwargs):
-        pass
-
-    # service
-    def handle_pk_user_request(self, request):
-        pass
-
-    def handle_list_user_request(self, request):
-        pass
-
-    def handle_list_filtered_request(self, request):
-        pass
