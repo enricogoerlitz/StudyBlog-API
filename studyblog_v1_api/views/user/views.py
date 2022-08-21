@@ -1,4 +1,7 @@
+"""Handles user routes like role, userrole, and user details"""
+
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.views import APIView
 from rest_framework.authentication import TokenAuthentication
 from rest_framework import status
 from rest_framework.response import Response
@@ -11,6 +14,7 @@ from studyblog_v1_api.utils import response as res
 
 
 class RoleViewSet(ModelViewSet):
+    """TODO: add description"""
     #authentication_classes = (TokenAuthentication, )
     serializer_class = RoleSerializer
     queryset = RoleModel.objects.all()
@@ -21,6 +25,7 @@ class RoleViewSet(ModelViewSet):
 
 
 class UserRoleViewSet(ModelViewSet):
+    """TODO: add description"""
     #authentication_classes = (TokenAuthentication, )
     serializer_class = UserRoleSerializer
     queryset = UserRoleModel.objects.all()
@@ -30,6 +35,7 @@ class UserRoleViewSet(ModelViewSet):
     # )
 
     def create(self, request, *args, **kwargs):
+        """TODO: add description"""
         try:
             # service!
             user_id = request.data.get(DB_FIELD_USER_ID)
@@ -56,6 +62,7 @@ class UserRoleViewSet(ModelViewSet):
             return res.error_500_internal_server_error(exp)
 
     def update(self, request, pk, *args, **kwargs):
+        """TODO: add description"""
         try:
             # service!
             user_id = request.data.get(DB_FIELD_USER_ID)
@@ -74,7 +81,6 @@ class UserRoleViewSet(ModelViewSet):
                 
                 return res.error_400_bad_request("The UserId and the RoleId was null. Please enter an UserId as well as an RoleId")
 
-
             is_existing = UserRoleModel.objects.filter(user_id=user_id, role_id=role_id).exists()
             if is_existing:
                 error_msg = f"Duplicate Key Error. The User with the id {user_id} already has the Role with the id {role_id}"
@@ -86,6 +92,7 @@ class UserRoleViewSet(ModelViewSet):
             return res.error_500_internal_server_error(exp)
     
     def partial_update(self, request, pk, *args, **kwargs):
+        """TODO: add description"""
         try:
             # service!
             user_id = request.data.get(DB_FIELD_USER_ID)
@@ -113,3 +120,20 @@ class UserRoleViewSet(ModelViewSet):
             return Response(curr_user_role.values()[0])
         except Exception as exp:
             return res.error_500_internal_server_error(exp)
+
+
+class UserDetails(APIView):
+    """TODO: add description"""
+
+    def get(self, request, *args, **kwargs):
+        pass
+
+    # service
+    def handle_pk_user_request(self, request):
+        pass
+
+    def handle_list_user_request(self, request):
+        pass
+
+    def handle_list_filtered_request(self, request):
+        pass
