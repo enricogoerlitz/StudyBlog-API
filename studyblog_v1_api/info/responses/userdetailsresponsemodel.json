@@ -1,0 +1,9 @@
+[
+	{
+		"id": 187,
+		"username": "Teddy",
+		"role": ["role1", "role2"],
+		"is_superuser": false,
+		"is_staff": true
+	}
+]

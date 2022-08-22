@@ -40,6 +40,27 @@ class UserViewSet(ModelViewSet):
         """
            /api/v1/profile/?details=true&user_id=1,2,4
         """
+
+        result = []
+        user_data = query.execute(query.base_user_details_query_2)
+        added_users = dict()
+        for row in user_data:
+            user_id = row["id"]
+            if not user_id in added_users.keys():
+                added_users[user_id] = len(result)
+                result.append({
+                    "id": user_id,
+                    "username": row["username"],
+                    "is_superuser": row["is_superuser"],
+                    "is_staff": row["is_staff"],
+                    "roles": [] if not row["role_name"] else [row["role_name"]],
+                })
+                continue
+            
+            result[added_users[user_id]]["roles"].append(row["role_name"])
+
+        return Response(result)
+
         details = request.query_params.get("details")
         user_ids = request.query_params.get("user_id")
         if user_ids:

@@ -1,0 +1,31 @@
+[
+	{
+		"id": 1,
+		"title": "title",
+		"content": "content",
+		"created": "12.05.2020",
+		"last_edit": "12.05.2020",
+		"creator": {
+			"id": 187,
+			"username": "Teddy",
+			"role": ["role1", "role2"],
+			"is_superuser": false,
+			"is_staff": true
+		},
+		"comments": [
+			{
+				"id": 188,
+				"content": "comment",
+				"created": "12.12.2019",
+				"last_edit": "12.12.2019",
+				"creator": {
+					"id": 187,
+					"username": "Ada",
+					"role": ["role1", "role2"],
+					"is_superuser": false,
+					"is_staff": true
+				}
+			}
+		]
+	}
+]
