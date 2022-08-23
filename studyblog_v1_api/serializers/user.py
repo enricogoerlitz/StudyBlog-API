@@ -1,4 +1,9 @@
+""""""
+
 from rest_framework.serializers import ModelSerializer
+
+from studyblog_v1_api.services import user_service
+from studyblog_v1_api.utils import type_check
 from studyblog_v1_api.models import (
     UserProfileModel,
     RoleModel,
@@ -15,7 +20,7 @@ class UserProfileSerializer(ModelSerializer):
 
     class Meta:
         model = UserProfileModel
-        fields = (DB_FIELD_ID, DB_FIELD_USERNAME)
+        fields = (DB_FIELD_ID, DB_FIELD_USERNAME, DB_FIELD_PASSWORD)
         extra_kwargs = {
             DB_FIELD_PASSWORD: {
                 "write_only": True,
@@ -23,12 +28,55 @@ class UserProfileSerializer(ModelSerializer):
             }
         }
 
-    def create(self, validated_data):
+    def create(self, validated_data, *args, **kwargs):
         """Handle creating a new user"""
-        return UserProfileModel.objects.create_user(
+        # alles in user_service!
+        #req_roles = 
+
+        request = self._context["request"]
+        passed_user_role_ids = request.data.get("role_id") # None?
+
+        # {
+        #       "username": "NewUser2",
+        #       "password": "test",
+        #       "role_id": [3, 5, 6]
+        # }
+
+
+        print(passed_user_role_ids)
+        user_roles = []
+        
+        if (
+            passed_user_role_ids and
+            user_service.is_authenticated(request) and 
+            user_service.isin_role(request, "admin")
+        ):
+            # validate roles!
+            if type_check.is_list_or_tuple(passed_user_role_ids):
+                user_roles = list(passed_user_role_ids)
+            else:
+                user_roles.append(passed_user_role_ids)
+        else:
+            user_roles.append(RoleModel.objects.get(role_name="student").id)
+        
+
+        created_user = UserProfileModel.objects.create_user(
             username=validated_data.get(DB_FIELD_USERNAME),
             password=validated_data.get(DB_FIELD_PASSWORD),
         )
+
+        if created_user:
+            for role in user_roles:
+                UserRoleModel.objects.create(user_id=created_user.id, role_id=role)
+            return {
+                "id": created_user.id,
+                "username": created_user.username,
+                "roles": user_roles
+            }
+            
+
+
+        return created_user
     
     def update(self, instance, validated_data):
         """Handle updating an user"""

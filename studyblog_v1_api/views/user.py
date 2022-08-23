@@ -3,6 +3,7 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
 from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.settings import api_settings
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
@@ -11,6 +12,7 @@ from rest_framework.response import Response
 
 from studyblog_v1_api.serializers import UserProfileSerializer
 from studyblog_v1_api.utils import response as res
+from studyblog_v1_api.utils.request import is_authenticated, isin_role
 from studyblog_v1_api.db import query
 from studyblog_v1_api.models import (
     UserProfileModel,
@@ -32,10 +34,17 @@ class UserViewSet(ModelViewSet):
     """Handle creating, updating and filtering profiles"""
     serializer_class = UserProfileSerializer
     queryset = UserProfileModel.objects.all()
+    #permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
     filter_backends = (SearchFilter,)
     search_fields = (DB_FIELD_USERNAME,)
 
+    def perform_create(self, serializer):
+        print("EXE-Perform-create")
+        return super().perform_create(serializer)
+
+    @is_authenticated
+    #@isin_role("Admin")
     def list(self, request, *args, **kwargs):
         """
            /api/v1/profile/?details=true&user_id=1,2,4
@@ -89,26 +98,24 @@ class UserAuthTokenApiView(ObtainAuthToken):
 
 class RoleViewSet(ModelViewSet):
     """TODO: add description"""
-    #authentication_classes = (TokenAuthentication, )
+    authentication_classes = (TokenAuthentication, )
     serializer_class = RoleSerializer
     queryset = RoleModel.objects.all()
-    # permission_classes = (
-    #     permissions.UpdateOwnFeedItem,
-    #     IsAuthenticated
-    # )
+    permission_classes = (
+        IsAuthenticated,
+    )
     # filter_backends = (SearchFilter,)
     # search_fields = (DB_FIELD_ROLE_NAME,)
 
 
 class UserRoleViewSet(ModelViewSet):
     """TODO: add description"""
-    #authentication_classes = (TokenAuthentication, )
+    authentication_classes = (TokenAuthentication, )
     serializer_class = UserRoleSerializer
     queryset = UserRoleModel.objects.all()
-    # permission_classes = (
-    #     permissions.UpdateOwnFeedItem,
-    #     IsAuthenticated
-    # )
+    permission_classes = (
+        IsAuthenticated,
+    )
 
     def create(self, request, *args, **kwargs):
         """TODO: add description"""

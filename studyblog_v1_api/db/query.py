@@ -1,10 +1,15 @@
-from typing import Any
+""""""
+# mypy: ignore-errors
+
+from typing import Any, Union
 from django.db import connection
 
 
-def execute(query, *args, **kwargs) -> list[dict[str, Any]]:
+def execute(query, formatter_func=None, *args, **kwargs) -> Union[list[dict[str, Any]], Any]:
     cursor = connection.cursor()
     result = cursor.execute(query, *args, **kwargs)
+    if formatter_func:
+        return formatter_func(cursor, result)
     return serialize_query(cursor, result)
 
 def serialize_query(cursor, result):
@@ -24,6 +29,7 @@ base_user_details_query = """
     JOIN
         studyblog_v1_api_userprofilemodel u ON u.id = ur.user_id
 """
+
 
 def fetch_all_user_details(user_id=None) -> str:
     # TODO: more details
@@ -70,6 +76,7 @@ base_blogpost_details_query = """
     JOIN 
         studyblog_v1_api_rolemodel r ON ur.role_id = r.id
 """
+
 
 def fetch_all_blogpost_details() -> str:
     # TODO: more details
@@ -119,3 +126,27 @@ base_blogpost_details_query_2 = """
         studyblog_v1_api_rolemodel rbpc ON urbpc.role_id = rbpc.id
     ORDER BY bp.created
 """
+
+
+base_is_in_role_query = """
+    SELECT 
+        r.role_name
+    FROM 
+        studyblog_v1_api_userrolemodel ur
+    JOIN
+        studyblog_v1_api_userprofilemodel u ON ur.user_id = u.id
+    JOIN
+        studyblog_v1_api_rolemodel r ON ur.role_id = r.id
+    WHERE 
+        u.id = 
+"""
+
+def fetch_user_roles(id) -> str:
+    return f"{base_is_in_role_query}{id}"
+
+
+def fetch_execute_user_roles(id) -> list[str]:
+    return execute(
+        fetch_user_roles(id), 
+        formatter_func=lambda _, result: [obj[0] for obj in result]
+    )

@@ -1,10 +1,9 @@
 """"""
 
-from datetime import datetime
-
 from django.db import connection
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.filters import SearchFilter
 
@@ -25,8 +24,8 @@ from studyblog_v1_api.models import (
 
 class BlogPostViewSet(ModelViewSet):
     """"""
-    #permission_classes = ()
-    #authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
     serializer_class = BlogPostSerializer
     queryset = BlogPostModel.objects.all()
     # filter_backends = (SearchFilter, )
@@ -96,33 +95,26 @@ class BlogPostViewSet(ModelViewSet):
             if not comment_id: 
                 continue
             
-            print("--")
-            print(comment_id)
-            print(added_comments)
-            print(comment_id in added_comments.keys())
-            
             if comment_id in added_comments.keys():
                 blogpost["comments"][added_comments[comment_id]]["creator"]["roles"].append(row["comment_creator_role_name"])
                 continue
             
             added_comments[comment_id] = len(blogpost["comments"])
             
-            blogpost["comments"].append(
-                {
-                    "id": row["comment_id"],
-                    "content": row["comment_content"],
-                    "responded_comment_id": row["responded_comment_id"],
-                    "created": row["comment_created"],
-                    "last_edit": row["comment_last_edit"],
-                    "creator": {
-                        "id": row["comment_creator_id"],
-                        "username": row["comment_creator_username"],
-                        "roles": [row["comment_creator_role_name"]],
-                        "is_superuser": row["comment_creator_is_superuser"],
-                        "is_staff": row["comment_creator_is_staff"]
-                    }
+            blogpost["comments"].append({
+                "id": row["comment_id"],
+                "content": row["comment_content"],
+                "responded_comment_id": row["responded_comment_id"],
+                "created": row["comment_created"],
+                "last_edit": row["comment_last_edit"],
+                "creator": {
+                    "id": row["comment_creator_id"],
+                    "username": row["comment_creator_username"],
+                    "roles": [row["comment_creator_role_name"]],
+                    "is_superuser": row["comment_creator_is_superuser"],
+                    "is_staff": row["comment_creator_is_staff"]
                 }
-            )
+            })
         
         return Response(result)
  
@@ -146,8 +138,8 @@ class BlogPostViewSet(ModelViewSet):
 
 class BlogPostCommentViewSet(ModelViewSet):
     """"""
-    #permission_classes = ()
-    #authentication_classes = (TokenAuthentication, )
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication, )
     serializer_class = BlogPostCommentSerializer
     queryset = BlogPostCommentModel.objects.all()
     # filter_backends = (SearchFilter, )
