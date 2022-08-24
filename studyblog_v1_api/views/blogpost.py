@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.filters import SearchFilter
 
-from studyblog_v1_api.db import query
+from studyblog_v1_api.db import query, filter
 from studyblog_v1_api.serializers import BlogPostCommentSerializer, BlogPostSerializer
 from studyblog_v1_api.permissions import BlogPostPermission
 from studyblog_v1_api.models import (
@@ -39,7 +39,7 @@ class BlogPostViewSet(ModelViewSet):
         details = request.query_params.get("details") # to constant
 
 
-        blogpost_data = query.execute(query.base_blogpost_details_query_2)
+        blogpost_data = query.execute(filter.base_blogpost_details_query_2)
 
         result = []
         added_blogposts = dict()
@@ -120,7 +120,7 @@ class BlogPostViewSet(ModelViewSet):
  
         if details and details.lower() == "true":
             # WITH COMMENTS!
-            return Response(query.execute(query.fetch_all_blogpost_details()))
+            return Response(query.execute(filter.fetch_all_blogpost_details()))
 
         return super().list(request, *args, **kwargs)
     

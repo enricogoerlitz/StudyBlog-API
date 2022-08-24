@@ -1,10 +1,9 @@
-""""""
-
 from rest_framework.permissions import BasePermission
 
 from studyblog_v1_api.db import query, roles
 from studyblog_v1_api.models import RoleModel
 from studyblog_v1_api.services import user_service
+from studyblog_v1_api.utils.request import GET, POST, PUT, PATCH, DELETE
 
 
 class UserProfilePermission(BasePermission):
@@ -27,13 +26,10 @@ class UserProfilePermission(BasePermission):
     """
 
     def has_object_permission(self, request, view, obj):
-        if request.method == "GET":
-            return request.user.is_authenticated
+        if request.method in [GET, POST]:
+            return True
 
-        if request.method == "POST":
-            return user_service.isin_role((roles.ADMIN, roles.STUDENT), request=request)
-    
-        if request.method in ["PUT", "PATCH", "DELETE"]:
+        if request.method in [PUT, PATCH, DELETE]:
             if user_service.isin_role(roles.ADMIN, request=request):
                 return not user_service.isin_role(roles.ADMIN, id=obj.id)
             return obj.id == request.user.id
@@ -56,10 +52,10 @@ class UserRolePermission(BasePermission):
         if not user_service.isin_role(roles.ADMIN, request=request):
             return False
 
-        if request.method in ["GET", "POST"]:
+        if request.method in [GET, POST]:
             return True
         
-        if request.method in ["PUT", "PATCH", "DELETE"]:
+        if request.method in [PUT, PATCH, DELETE]:
             admin_id = query.execute(f"""
                 SELECT id FROM studyblog_v1_api_rolemodel WHERE role_name = '{roles.ADMIN}'
             """)[0]["id"]

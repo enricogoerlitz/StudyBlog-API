@@ -3,7 +3,7 @@
 from rest_framework.response import Response
 from rest_framework import status
 
-from studyblog_v1_api.db import query
+from studyblog_v1_api.db import query, filter
 
 
 GET = "GET"
@@ -83,7 +83,7 @@ def isin_role(auth_roles, auth_way="or"):
             if not is_list and not isinstance(auth_roles, str):
                 raise TypeError("No valid roles passed. Please pass one role as string or multiple roles as list of strings.")
 
-            user_roles = query.fetch_execute_user_roles(request.user.id)
+            user_roles = filter.fetch_execute_user_roles(request.user.id)
 
             access_denied_response = Response({"error": "Access denied. User hasn't the needed permission to access this resource."}, status=status.HTTP_401_UNAUTHORIZED)
             access_granted_response = lambda: func(view, request, *args, **kwargs)

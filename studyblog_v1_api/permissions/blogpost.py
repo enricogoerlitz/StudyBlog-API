@@ -1,9 +1,8 @@
-""""""
-
-from rest_framework.permissions import BasePermission, SAFE_METHODS
+from rest_framework.permissions import BasePermission
 
 from studyblog_v1_api.db import roles
 from studyblog_v1_api.services import user_service
+from studyblog_v1_api.utils.request import GET, POST, PUT, PATCH, DELETE
 
 
 class BlogPostPermission(BasePermission):
@@ -29,13 +28,13 @@ class BlogPostPermission(BasePermission):
     """
 
     def has_object_permission(self, request, view, obj):
-        if request.method == "GET":
+        if request.method == GET:
             return request.user.is_authenticated
 
-        if request.method == "POST":
+        if request.method == POST:
             return user_service.isin_role((roles.STUDENT, roles.ADMIN), request=request)
 
-        if request.method in ["PUT", "PATCH", "DELETE"]:
+        if request.method in [PUT, PATCH, DELETE]:
             if user_service.isin_role(roles.ADMIN, request=request):
                 return True
             return obj.user.id == request.user.id

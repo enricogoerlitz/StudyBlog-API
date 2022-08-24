@@ -1,6 +1,5 @@
--- SQLite
--- SQLite
--- SQLite
+-- Collection and achieve of tested sql-queries
+
 SELECT 
     bpm.id, bpm.content, bpm.user_id, u.username, ur.role_id, r.role_name, u.is_superuser, u.is_staff, bpm.created, bpm.last_edit
 FROM 
@@ -11,6 +10,7 @@ JOIN
     studyblog_v1_api_userrolemodel ur ON bpm.user_id = ur.user_id
 JOIN 
     studyblog_v1_api_rolemodel r ON ur.role_id = r.id
+
 
 SELECT 
     * 
@@ -26,7 +26,7 @@ FROM
 LEFT JOIN 
     studyblog_v1_api_blogpostcommentmodel self_bpc ON bpc.id = self_bpc.blogpost_comment_id
 
--- SQLite
+
 SELECT 
     bp.id AS blogpost_id,
     bp.title AS blogpost_title, 
@@ -65,6 +65,7 @@ JOIN
 JOIN
     studyblog_v1_api_rolemodel rbpc ON urbpc.role_id = rbpc.id
 ORDER BY bp.created
+
 
 SELECT 
     bp.id AS blogpost_id,

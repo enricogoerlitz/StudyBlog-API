@@ -19,11 +19,6 @@ class BlogPostModel(models.Model):
     def __str__(self):
         """returns model as string"""
         return f"title: {self.title[:5]}... | Content: {self.content[:10]}..."
-    
-
-class BlogPostDetailsResponseModel():
-    def __init__():
-        pass
 
 
 class BlogPostCommentModel(models.Model):
@@ -51,5 +46,3 @@ class BlogPostCommentModel(models.Model):
     def __str__(self):
         """returns model as string"""
         return f"{self.content[:8]}..."
-    
-

@@ -8,7 +8,7 @@ from studyblog_v1_api.models import (
 
 
 class BlogPostSerializer(ModelSerializer):
-    """"""
+    """Serialize BlogPostModel"""
     
     class Meta:
         model = BlogPostModel
@@ -16,6 +16,7 @@ class BlogPostSerializer(ModelSerializer):
 
 
 class BlogPostCommentSerializer(ModelSerializer):
+    """Serialize BlogPostCommentModel"""
     
     class Meta:
         model = BlogPostCommentModel

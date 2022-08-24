@@ -14,7 +14,7 @@ from studyblog_v1_api.serializers import UserProfileSerializer
 from studyblog_v1_api.utils import response as res
 from studyblog_v1_api.utils.request import is_authenticated, isin_role
 from studyblog_v1_api.permissions import UserProfilePermission, UserRolePermission, RolePermission
-from studyblog_v1_api.db import query
+from studyblog_v1_api.db import query, filter
 from studyblog_v1_api.models import (
     UserProfileModel,
     UserRoleModel,
@@ -35,12 +35,12 @@ class UserViewSet(ModelViewSet):
     """Handle creating, updating and filtering profiles"""
     serializer_class = UserProfileSerializer
     queryset = UserProfileModel.objects.all()
-    permission_classes = (IsAuthenticated, UserProfilePermission)
+    permission_classes = (UserProfilePermission,)
     authentication_classes = (TokenAuthentication,)
     filter_backends = (SearchFilter,)
     search_fields = (DB_FIELD_USERNAME,)
 
-    @is_authenticated
+    #@is_authenticated
     #@isin_role("Admin")
     def list(self, request, *args, **kwargs):
         """
@@ -48,7 +48,7 @@ class UserViewSet(ModelViewSet):
         """
 
         result = []
-        user_data = query.execute(query.base_user_details_query_2)
+        user_data = query.execute(filter.base_user_details_query_2)
         added_users = dict()
         for row in user_data:
             user_id = row["id"]
@@ -75,7 +75,7 @@ class UserViewSet(ModelViewSet):
         if details and details.lower() == "true":
             # error handling -> bei failing id finding!!!
             # + username!
-            return Response(query.execute(query.fetch_all_user_details(user_id=user_ids)))
+            return Response(query.execute(filter.fetch_all_user_details(user_id=user_ids)))
 
         if user_ids:
             users = UserProfileModel.objects.filter(id__in=user_ids)

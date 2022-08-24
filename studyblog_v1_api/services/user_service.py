@@ -1,6 +1,5 @@
-""""""
-
-from studyblog_v1_api.db import query
+from studyblog_v1_api.db import query, filter, roles
+from studyblog_v1_api.models import UserProfileModel, UserRoleModel, RoleModel, DB_FIELD_ROLE_ID, DB_FIELD_USERNAME, DB_FIELD_PASSWORD
 from studyblog_v1_api.utils import type_check
 
 
@@ -8,12 +7,16 @@ def is_authenticated(request):
     return request.user.is_authenticated
 
 
+def is_role_valid():
+    pass
+
+
 def isin_role(auth_roles, request=None, id=None, auth_way="or"):
     _validate_isin_role_inputs(auth_roles, request, id, auth_way)
 
     id = id if id else request.user.id
     is_list = type_check.is_list_or_tuple(auth_roles)
-    user_roles = query.fetch_execute_user_roles(id)
+    user_roles = filter.fetch_execute_user_roles(id)
 
     if auth_way == "or":
         if is_list:
@@ -57,3 +60,35 @@ def _validate_isin_role_inputs(auth_roles, request, id, auth_way):
     elif not isinstance(auth_roles, str):
         raise TypeError("No valid roles passed. Please pass one role as string or multiple roles as list of strings.")
 
+
+def create_user(request, validated_data):
+    """Handle creating a new user"""
+    passed_user_role_ids = request.data.get(DB_FIELD_ROLE_ID)
+    user_roles = []
+    # raise error when error
+    if passed_user_role_ids and not is_authenticated(request):
+        # custom exception!
+        raise Exception("It was passed an role id, but only admins!")
+        
+    if (
+        passed_user_role_ids and
+        isin_role(roles.ADMIN, request=request)
+    ):
+        # validate roles! -> SELECT - IN() -> len() = len()
+        if type_check.is_list_or_tuple(passed_user_role_ids):
+            user_roles = list(passed_user_role_ids)
+        else:
+            user_roles.append(passed_user_role_ids)
+    else:
+        user_roles.append(RoleModel.objects.get(role_name=roles.STUDENT).id)
+
+    created_user = UserProfileModel.objects.create_user(
+        username=validated_data.get(DB_FIELD_USERNAME),
+        password=validated_data.get(DB_FIELD_PASSWORD),
+    )
+
+    if created_user:
+        for role in user_roles:
+            UserRoleModel.objects.create(user_id=created_user.id, role_id=role)
+
+    return created_user

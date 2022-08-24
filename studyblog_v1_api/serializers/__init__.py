@@ -1,4 +1,4 @@
 # mypy: ignore-errors
 
-from .blogpost import *
+from .blogpost import BlogPostSerializer, BlogPostCommentSerializer
 from .user import *

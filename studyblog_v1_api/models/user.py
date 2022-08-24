@@ -16,12 +16,11 @@ class UserProfileManager(BaseUserManager):
         user.set_password(password)
         user.save(using=self._db)
 
-        # TODO: save user.id with initial role.id to UserRole
-
         return user
 
     def create_superuser(self, username, password):
         """Create and save a new superuser with given details"""
+
         user = self.create_user(username, password)
         user.is_superuser = True
         user.is_staff = True
@@ -32,11 +31,11 @@ class UserProfileManager(BaseUserManager):
 
 class UserProfileModel(AbstractBaseUser, PermissionsMixin):
     """Database model for users in the system"""
+
     username = models.CharField(max_length=30, unique=True)
     
-    # is requiered of AbstractBaseUser
+    # is required of AbstractBaseUser
     is_staff = models.BooleanField(default=False)
-
 
     # UserProfileManager -> creating and managing new und current users
     objects = UserProfileManager() 
@@ -76,7 +75,6 @@ class UserRoleModel(models.Model):
         null=False,
         blank=False
     )
-
     role = models.ForeignKey(
         to=RoleModel,
         on_delete=models.CASCADE,
@@ -85,4 +83,5 @@ class UserRoleModel(models.Model):
     )
 
     def __str__(self):
+        """returns model as string"""
         return f"UserId: {self.user_id} | RoleId: {self.role_id}"
