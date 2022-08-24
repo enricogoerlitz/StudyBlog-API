@@ -6,6 +6,13 @@ from rest_framework import status
 from studyblog_v1_api.db import query
 
 
+GET = "GET"
+POST = "POST"
+PUT = "PUT"
+PATCH = "PATCH"
+DELETE = "DELETE"
+
+
 class ValidDataWrapper:
     def __init__(self, data, error_msg=None):
         if data is None and error_msg is None:
@@ -55,6 +62,7 @@ def isin_role(auth_roles, auth_way="or"):
         auth_roles (_type_): _description_
         auth_way (str, optional): "or" | "and".
     """
+    # NEW!!!
     def decorator(func):
         def wrapper(view, request, *args, **kwargs):
             if not request.user.is_authenticated:

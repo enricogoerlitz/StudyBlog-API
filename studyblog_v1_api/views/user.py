@@ -13,6 +13,7 @@ from rest_framework.response import Response
 from studyblog_v1_api.serializers import UserProfileSerializer
 from studyblog_v1_api.utils import response as res
 from studyblog_v1_api.utils.request import is_authenticated, isin_role
+from studyblog_v1_api.permissions import UserProfilePermission, UserRolePermission, RolePermission
 from studyblog_v1_api.db import query
 from studyblog_v1_api.models import (
     UserProfileModel,
@@ -34,14 +35,10 @@ class UserViewSet(ModelViewSet):
     """Handle creating, updating and filtering profiles"""
     serializer_class = UserProfileSerializer
     queryset = UserProfileModel.objects.all()
-    #permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, UserProfilePermission)
     authentication_classes = (TokenAuthentication,)
     filter_backends = (SearchFilter,)
     search_fields = (DB_FIELD_USERNAME,)
-
-    def perform_create(self, serializer):
-        print("EXE-Perform-create")
-        return super().perform_create(serializer)
 
     @is_authenticated
     #@isin_role("Admin")
@@ -101,21 +98,21 @@ class RoleViewSet(ModelViewSet):
     authentication_classes = (TokenAuthentication, )
     serializer_class = RoleSerializer
     queryset = RoleModel.objects.all()
-    permission_classes = (
-        IsAuthenticated,
-    )
+    permission_classes = (IsAuthenticated, RolePermission)
     # filter_backends = (SearchFilter,)
     # search_fields = (DB_FIELD_ROLE_NAME,)
 
 
 class UserRoleViewSet(ModelViewSet):
     """TODO: add description"""
-    authentication_classes = (TokenAuthentication, )
+    authentication_classes = (TokenAuthentication,)
     serializer_class = UserRoleSerializer
     queryset = UserRoleModel.objects.all()
-    permission_classes = (
-        IsAuthenticated,
-    )
+    permission_classes = (IsAuthenticated, UserRolePermission)
+
+    def list(self, request, *args, **kwargs):
+        #print(UserRolePermission().has_object_permission(request, self, None))
+        return super().list(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
         """TODO: add description"""

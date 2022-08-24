@@ -13,7 +13,7 @@ router.register("blogpost-comment", views.BlogPostCommentViewSet)
 
 
 urlpatterns = [
-    path("test/", views.TestApiView.as_view()),
+    path("test/", views.TestAPIView.as_view()),
     path("login/", views.UserAuthTokenApiView.as_view()),
     path("", include(router.urls))
 ]

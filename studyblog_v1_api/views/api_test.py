@@ -6,7 +6,7 @@ from studyblog_v1_api.db import query
 from studyblog_v1_api.utils.request import isin_role
 
 
-class TestApiView(APIView):
+class TestAPIView(APIView):
     """Tests the API without any permissions"""
     authentication_classes = (TokenAuthentication,)
 
@@ -21,3 +21,7 @@ class TestApiView(APIView):
             "message": "You successful send a request to this api! Use /v1/api/login to get your token or /v1/api/register to register and get your token.",
             "current_user": str(vars(request.user))
         })
+    
+
+class InitApiAPIView(APIView):
+    pass

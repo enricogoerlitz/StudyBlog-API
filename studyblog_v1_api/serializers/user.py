@@ -4,6 +4,7 @@ from rest_framework.serializers import ModelSerializer
 
 from studyblog_v1_api.services import user_service
 from studyblog_v1_api.utils import type_check
+from studyblog_v1_api.db import roles
 from studyblog_v1_api.models import (
     UserProfileModel,
     RoleModel,
@@ -48,8 +49,7 @@ class UserProfileSerializer(ModelSerializer):
         
         if (
             passed_user_role_ids and
-            user_service.is_authenticated(request) and 
-            user_service.isin_role(request, "admin")
+            user_service.isin_role(roles.ADMIN, request=request)
         ):
             # validate roles!
             if type_check.is_list_or_tuple(passed_user_role_ids):
@@ -57,7 +57,7 @@ class UserProfileSerializer(ModelSerializer):
             else:
                 user_roles.append(passed_user_role_ids)
         else:
-            user_roles.append(RoleModel.objects.get(role_name="student").id)
+            user_roles.append(RoleModel.objects.get(role_name=roles.STUDENT).id)
         
 
         created_user = UserProfileModel.objects.create_user(

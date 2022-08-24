@@ -9,6 +9,7 @@ from rest_framework.filters import SearchFilter
 
 from studyblog_v1_api.db import query
 from studyblog_v1_api.serializers import BlogPostCommentSerializer, BlogPostSerializer
+from studyblog_v1_api.permissions import BlogPostPermission
 from studyblog_v1_api.models import (
     BlogPostCommentModel, 
     BlogPostModel,
@@ -24,7 +25,7 @@ from studyblog_v1_api.models import (
 
 class BlogPostViewSet(ModelViewSet):
     """"""
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, BlogPostPermission)
     authentication_classes = (TokenAuthentication,)
     serializer_class = BlogPostSerializer
     queryset = BlogPostModel.objects.all()
@@ -32,8 +33,7 @@ class BlogPostViewSet(ModelViewSet):
     # search_fields = (DB_TI)
 
     def perform_create(self, serializer):
-        #serializer.save(user=self.request.user)
-        return super().perform_create(serializer)
+        serializer.save(user=self.request.user)
 
     def list(self, request, *args, **kwargs):
         details = request.query_params.get("details") # to constant
@@ -138,7 +138,7 @@ class BlogPostViewSet(ModelViewSet):
 
 class BlogPostCommentViewSet(ModelViewSet):
     """"""
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, BlogPostPermission)
     authentication_classes = (TokenAuthentication, )
     serializer_class = BlogPostCommentSerializer
     queryset = BlogPostCommentModel.objects.all()
