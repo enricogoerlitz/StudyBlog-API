@@ -2,7 +2,16 @@
 Module for custom db filter queries.
 """
 
+# mypy: ignore-errors
+
+from typing import Union
 from studyblog_v1_api.db import query
+from studyblog_v1_api.utils import type_check
+
+
+def is_details(request):
+    details = request.query_params.get("details")
+    return False if not details or details.lower() != "true" else True
 
 
 base_user_details_query = """
@@ -19,20 +28,12 @@ base_user_details_query = """
 
 def fetch_all_user_details(user_id=None) -> str:
     # TODO: more details
-    if isinstance(user_id, int):
+    if type_check.is_int(user_id):
         single_user_query = f"{base_user_details_query} WHERE ur.user_id = {user_id}"
         return single_user_query
     
-    if isinstance(user_id, list) or isinstance(user_id, tuple):
-        multiple_user_query = f"{base_user_details_query} WHERE ur.user_id IN("
-        for i, id in enumerate(user_id):
-            if i == 0:
-                multiple_user_query += f"{id}"
-                continue
-            multiple_user_query += f", {id}"
-
-        multiple_user_query += ")"
-        return multiple_user_query
+    if type_check.is_list_or_tuple(user_id):
+        return _add_IN_to_query(base_user_details_query, "ur.user_id", user_id)
 
     return base_user_details_query
 
@@ -51,25 +52,6 @@ base_user_details_query_2 = """
 
 
 base_blogpost_details_query = """
-    SELECT 
-        bpm.id, bpm.content, bpm.user_id, u.username, ur.role_id, r.role_name, u.is_superuser, u.is_staff, bpm.created, bpm.last_edit
-    FROM 
-        studyblog_v1_api_blogpostmodel bpm
-    JOIN 
-        studyblog_v1_api_userprofilemodel u ON bpm.user_id = u.id
-    JOIN
-        studyblog_v1_api_userrolemodel ur ON bpm.user_id = ur.user_id
-    JOIN 
-        studyblog_v1_api_rolemodel r ON ur.role_id = r.id
-"""
-
-
-def fetch_all_blogpost_details() -> str:
-    # TODO: more details
-    return base_blogpost_details_query
-
-
-base_blogpost_details_query_2 = """
     SELECT 
         bp.id AS blogpost_id,
         bp.title AS blogpost_title, 
@@ -110,8 +92,26 @@ base_blogpost_details_query_2 = """
         studyblog_v1_api_rolemodel rbp ON urbp.role_id = rbp.id
     LEFT JOIN
         studyblog_v1_api_rolemodel rbpc ON urbpc.role_id = rbpc.id
-    ORDER BY bp.created
+    
 """
+
+
+def fetch_blogpost_details(blogpost_id=None) -> str:
+    # TODO: more details
+    order_by_clause = "ORDER BY bp.created"
+    if not blogpost_id:
+        return f"{base_blogpost_details_query} {order_by_clause}"
+    
+    if type_check.is_int(blogpost_id):
+        return f"{base_blogpost_details_query} WHERE ubp.id = {blogpost_id}"
+    
+    if type_check.is_list_or_tuple(blogpost_id):
+        query = _add_IN_to_query(base_blogpost_details_query, "ubp.id", blogpost_id)
+        return f"{query} {order_by_clause}"
+    print("TEST")
+
+    return base_blogpost_details_query
+
 
 
 base_is_in_role_query = """
@@ -136,3 +136,15 @@ def fetch_execute_user_roles(id) -> list[str]:
         fetch_user_roles(id), 
         formatter_func=lambda _, result: [obj[0] for obj in result]
     )
+
+
+def _add_IN_to_query(query, field: str, ids: Union[list, tuple]) -> str:
+    multiple_IN_query = f"{query} WHERE {field} IN("
+    for i, id in enumerate(ids):
+        if i == 0:
+            multiple_IN_query += f"{id}"
+            continue
+        multiple_IN_query += f", {id}"
+
+    multiple_IN_query += ")"
+    return multiple_IN_query

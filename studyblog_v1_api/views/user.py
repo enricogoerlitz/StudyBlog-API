@@ -46,6 +46,11 @@ class UserViewSet(ModelViewSet):
         """
            /api/v1/profile/?details=true&user_id=1,2,4
         """
+        user_ids = request.query_params.get("user_id")
+        if user_ids:
+            user_ids = user_ids.split(",")
+        return Response(query.execute(filter.fetch_all_user_details(user_id=user_ids)))
+
 
         result = []
         user_data = query.execute(filter.base_user_details_query_2)
