@@ -16,8 +16,7 @@ def get_item_list(request):
         return _serialize(BlogPostModel.objects.all(), many=True)
     
     blogpost_data = query.execute(filter.fetch_blogpost_details())
-    if len(blogpost_data) == 0:
-        return []
+    if len(blogpost_data) == 0: return []
     
     return _get_blogpost_items(blogpost_data)
 
@@ -27,8 +26,7 @@ def get_item(request, pk):
         return _serialize(BlogPostModel.objects.get(id=pk), many=False)
 
     blogpost_data = query.execute(filter.fetch_blogpost_details(pk))
-    if len(blogpost_data) == 0:
-        raise ObjectDoesNotExist()
+    if len(blogpost_data) == 0: raise ObjectDoesNotExist()
 
     return _get_blogpost_obj(blogpost_data[0])
     
@@ -56,8 +54,7 @@ def _get_blogpost_items(blogpost_data):
 
         if not blogpost_id in added_blogposts:
             added_blogposts[blogpost_id] = len(result)
-            if comment_id:
-                added_comments[comment_id] = 0
+            if comment_id: added_comments[comment_id] = 0
 
             result.append(_get_blogpost_obj(row))
             continue
@@ -67,8 +64,7 @@ def _get_blogpost_items(blogpost_data):
             blogpost["creator"]["roles"].append(row["creator_role_name"])
             continue
 
-        if not comment_id: 
-            continue
+        if not comment_id: continue
         
         if comment_id in added_comments:
             blogpost["comments"][added_comments[comment_id]]["creator"]["roles"].append(row["comment_creator_role_name"])

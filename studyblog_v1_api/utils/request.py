@@ -1,5 +1,3 @@
-"""Middleware"""
-
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -25,7 +23,7 @@ class ValidDataWrapper:
 
 def get_id_obj(model, Serializer, auto_exe=True):
     """
-    Checks, whether an id was passed the a get request.
+    Decorator: Checks, whether an id was passed the a get request.
 
     Args:
         model (DB_Model): an DB Model
@@ -33,7 +31,6 @@ def get_id_obj(model, Serializer, auto_exe=True):
     """
     def decorator(func):
         def wrapper(view, request, *args, **kwargs):
-            #request = args[0]
             id = request.query_params.get("id")
             if not id:
                 return func(view, *args, **kwargs)
@@ -56,13 +53,10 @@ def get_id_obj(model, Serializer, auto_exe=True):
     return decorator
 
 def isin_role(auth_roles, auth_way="or"): 
-    """_summary_
-
-    Args:
-        auth_roles (_type_): _description_
-        auth_way (str, optional): "or" | "and".
+    """Decorator
+    
     """
-    # NEW!!!
+    # NEW!!! -> user_service
     def decorator(func):
         def wrapper(view, request, *args, **kwargs):
             if not request.user.is_authenticated:

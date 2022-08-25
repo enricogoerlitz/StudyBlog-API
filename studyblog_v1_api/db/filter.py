@@ -92,7 +92,6 @@ base_blogpost_details_query = """
         studyblog_v1_api_rolemodel rbp ON urbp.role_id = rbp.id
     LEFT JOIN
         studyblog_v1_api_rolemodel rbpc ON urbpc.role_id = rbpc.id
-    
 """
 
 

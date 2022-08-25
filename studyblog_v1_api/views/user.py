@@ -1,5 +1,3 @@
-""""""
-
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -40,8 +38,6 @@ class UserViewSet(ModelViewSet):
     filter_backends = (SearchFilter,)
     search_fields = (DB_FIELD_USERNAME,)
 
-    #@is_authenticated
-    #@isin_role("Admin")
     def list(self, request, *args, **kwargs):
         """
            /api/v1/profile/?details=true&user_id=1,2,4
