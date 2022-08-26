@@ -2,8 +2,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework import status
 from rest_framework.filters import SearchFilter
 
 from studyblog_v1_api.db import query, filter
@@ -40,13 +38,13 @@ class BlogPostViewSet(ModelViewSet):
     def list(self, request, *args, **kwargs):
         try:
             result = blogpost_service.get_item_list(request)
-            return Response(result)
+            return res.success(result)
         except Exception as exp:
             return res.error_500_internal_server_error(exp)
     
     def retrieve(self, request, pk, *args, **kwargs):
         try:
-            return Response(blogpost_service.get_item(request, pk))
+            return res.success(blogpost_service.get_item(request, pk))
         except ObjectDoesNotExist:
             return res.error_400_bad_request(f"BlogPost object with id {pk} does not exist.")
         except Exception as exp:
@@ -55,7 +53,7 @@ class BlogPostViewSet(ModelViewSet):
     def update(self, request, pk, *args, **kwargs):
         try:
             updated_blogpost = blogpost_service.update_item(request, pk)
-            return Response(updated_blogpost, status=status.HTTP_202_ACCEPTED)
+            return res.updated(updated_blogpost)
         except ValueError as exp:
             return res.error_400_bad_request(exp)
         except ObjectDoesNotExist:
@@ -77,14 +75,14 @@ class BlogPostCommentViewSet(ModelViewSet):
     def list(self, request, *args, **kwargs):
         try:
             result = blogpost_comment_service.get_item_list(request)
-            return Response(result)
+            return res.success(result)
         except Exception as exp:
             return res.error_500_internal_server_error(exp)
     
     def retrieve(self, request, pk, *args, **kwargs):
         try:
             result = blogpost_comment_service.get_item(request, pk)
-            return Response(result)
+            return res.success(result)
         except ObjectDoesNotExist:
             return res.error_400_bad_request(f"BlogPostComment object with id {pk} does not exist.")
         except Exception as exp:
@@ -93,7 +91,7 @@ class BlogPostCommentViewSet(ModelViewSet):
     def update(self, request, pk, *args, **kwargs):
         try:
             result = blogpost_comment_service.update_item(request, pk)
-            return Response(result)
+            return res.updated(result)
         except ValueError as exp:
             return res.error_400_bad_request(exp)
         except ObjectDoesNotExist as exp:

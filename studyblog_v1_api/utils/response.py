@@ -23,3 +23,12 @@ def error_403_forbidden(exp: Union[Exception, str, dict]) -> Response:
     if isinstance(exp, dict):
         Response(exp, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     return Response({"error": str(exp)}, status=status.HTTP_403_FORBIDDEN)
+
+def success(obj: dict):
+    return Response(obj, status=status.HTTP_200_OK)
+
+def created(created_obj: dict):
+    return Response(created_obj, status=status.HTTP_201_CREATED)
+
+def updated(updated_obj, dict):
+    Response(updated_obj, status=status.HTTP_202_ACCEPTED)

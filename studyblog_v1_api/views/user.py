@@ -2,14 +2,11 @@ from django.db import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
 
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.views import APIView
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.settings import api_settings
-from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.filters import SearchFilter
-from rest_framework.response import Response
 
 from studyblog_v1_api.serializers import UserProfileSerializer
 from studyblog_v1_api.utils import response as res
@@ -49,7 +46,7 @@ class UserViewSet(ModelViewSet):
         user_ids = request.query_params.get("user_id")
         if user_ids:
             user_ids = user_ids.split(",")
-        return Response(query.execute(filter.fetch_all_user_details(user_id=user_ids)))
+        return res.success(query.execute(filter.fetch_all_user_details(user_id=user_ids)))
 
 
         result = []
@@ -70,7 +67,7 @@ class UserViewSet(ModelViewSet):
             
             result[added_users[user_id]]["roles"].append(row["role_name"])
 
-        return Response(result)
+        return res.success(result)
 
         details = request.query_params.get("details")
         user_ids = request.query_params.get("user_id")
@@ -80,14 +77,14 @@ class UserViewSet(ModelViewSet):
         if details and details.lower() == "true":
             # error handling -> bei failing id finding!!!
             # + username!
-            return Response(query.execute(filter.fetch_all_user_details(user_id=user_ids)))
+            return res.success(query.execute(filter.fetch_all_user_details(user_id=user_ids)))
 
         if user_ids:
             users = UserProfileModel.objects.filter(id__in=user_ids)
             users = UserProfileSerializer(users, many=True).data
             if len(users) == 0:
                 return res.error_400_bad_request(f"No user with the ids {user_ids} found!")
-            return Response(users)
+            return res.success(users)
         
         # + username!
 
@@ -119,7 +116,7 @@ class UserRoleViewSet(ModelViewSet):
         """TODO: add description"""
         try:
             result = role_service.create_item(request)
-            return Response(result)
+            return res.success(result)
         except IntegrityError as exp:
             return res.error_400_bad_request(exp)
         except Exception as exp:
@@ -129,7 +126,7 @@ class UserRoleViewSet(ModelViewSet):
         """TODO: add description"""
         try:
             result = role_service.update_item(request, pk)
-            return Response(result)
+            return res.updated(result)
         except ObjectDoesNotExist:
             return res.error_400_bad_request(f"UserRole object with id {pk} does not exist.")
         except Exception as exp:
