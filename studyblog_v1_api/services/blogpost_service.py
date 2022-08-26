@@ -1,7 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 
 from studyblog_v1_api.models import BlogPostModel
-from studyblog_v1_api.serializers import BlogPostSerializer
+from studyblog_v1_api.serializers import serializer
 from studyblog_v1_api.db import query, filter
 from studyblog_v1_api.models import (
     DB_FIELD_CREATED,
@@ -13,7 +13,7 @@ from studyblog_v1_api.utils.request import PUT
 
 def get_item_list(request):
     if not filter.is_details(request):
-        return _serialize(BlogPostModel.objects.all(), many=True)
+        return serializer.model_to_json(BlogPostModel.objects.all())
     
     blogpost_data = query.execute(filter.fetch_blogpost_details())
     if len(blogpost_data) == 0: return []
@@ -23,7 +23,7 @@ def get_item_list(request):
 
 def get_item(request, pk):
     if not filter.is_details(request):
-        return _serialize(BlogPostModel.objects.get(id=pk), many=False)
+        return serializer.model_to_json(BlogPostModel.objects.get(id=pk))
 
     blogpost_data = query.execute(filter.fetch_blogpost_details(pk))
     if len(blogpost_data) == 0: raise ObjectDoesNotExist()
@@ -109,12 +109,8 @@ def _get_blogpost_comment_obj(data):
     }
 
 
-def _serialize(queryset, many):
-    return BlogPostSerializer(queryset, many=many).data
-
-
 def _update_save_blogpost(blogpost, title, content):
     if title: blogpost.title = title
     if content: blogpost.content = content
     blogpost.save()
-    return _serialize(blogpost, many=False)
+    return serializer.model_to_json(blogpost)

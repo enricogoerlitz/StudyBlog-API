@@ -1,13 +1,13 @@
 from django.core.exceptions import ObjectDoesNotExist
 
 from studyblog_v1_api.models import BlogPostCommentModel
-from studyblog_v1_api.serializers import BlogPostCommentSerializer
+from studyblog_v1_api.serializers import BlogPostCommentSerializer, serializer
 from studyblog_v1_api.db import query, filter
 
 
 def get_item_list(request):
     if not filter.is_details(request):
-        return _serialize(BlogPostCommentModel.objects.all(), many=True)
+        return serializer.model_to_json(BlogPostCommentModel.objects.all())
     
     blogpost_comment_data = query.execute(filter.fetch_blogpost_comment_details())
     if len(blogpost_comment_data) == 0: return []
@@ -17,7 +17,7 @@ def get_item_list(request):
 
 def get_item(request, pk):
     if not filter.is_details(request):
-        return _serialize(BlogPostCommentModel.objects.get(id=pk), many=False)
+        return serializer.model_to_json(BlogPostCommentModel.objects.get(id=pk))
 
     blogpost_comment_data = query.execute(filter.fetch_blogpost_comment_details(pk))
     if len(blogpost_comment_data) == 0: raise ObjectDoesNotExist()
@@ -34,7 +34,7 @@ def update_item(request, pk):
     current_blogpost_comment.content = content
     current_blogpost_comment.save()
 
-    return _serialize(current_blogpost_comment, many=False)
+    return serializer.model_to_json(current_blogpost_comment)
 
 
 def _get_comment_obj(data):
@@ -53,7 +53,3 @@ def _get_comment_obj(data):
             "is_staff": data["is_staff"]
         }
     }
-
-
-def _serialize(queryset, many):
-    return BlogPostCommentSerializer(queryset, many=many).data
