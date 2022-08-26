@@ -2,7 +2,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from studyblog_v1_api.models import BlogPostModel
 from studyblog_v1_api.serializers import BlogPostSerializer
-from studyblog_v1_api.db import query, filter, roles
+from studyblog_v1_api.db import query, filter
 from studyblog_v1_api.models import (
     DB_FIELD_CREATED,
     DB_FIELD_USER_ID,

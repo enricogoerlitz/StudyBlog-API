@@ -1,3 +1,5 @@
+from django.db import IntegrityError
+
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -13,6 +15,7 @@ from studyblog_v1_api.utils import response as res
 from studyblog_v1_api.utils.request import is_authenticated, isin_role
 from studyblog_v1_api.permissions import UserProfilePermission, UserRolePermission, RolePermission
 from studyblog_v1_api.db import query, filter
+from studyblog_v1_api.services import role_service
 from studyblog_v1_api.models import (
     UserProfileModel,
     UserRoleModel,
@@ -111,34 +114,13 @@ class UserRoleViewSet(ModelViewSet):
     queryset = UserRoleModel.objects.all()
     permission_classes = (IsAuthenticated, UserRolePermission)
 
-    def list(self, request, *args, **kwargs):
-        #print(UserRolePermission().has_object_permission(request, self, None))
-        return super().list(request, *args, **kwargs)
-
     def create(self, request, *args, **kwargs):
         """TODO: add description"""
         try:
-            # service!
-            user_id = request.data.get(DB_FIELD_USER_ID)
-            role_id = request.data.get(DB_FIELD_ROLE_ID)
-
-            if not user_id or not role_id:
-                if user_id is None and not role_id is None:
-                    return res.error_400_bad_request("The UserId was null. Please enter an UserId")
-                
-                if role_id is None and not user_id is None:
-                    return res.error_400_bad_request("The RoleId was null. Please enter an RoleId")
-                
-                return res.error_400_bad_request("The UserId and the RoleId was null. Please enter an UserId as well as an RoleId")
-
-            is_existing = UserRoleModel.objects.filter(user_id=user_id, role_id=role_id).exists()
-            if is_existing:
-                error_msg = f"Duplicate Key Error. The User with the id {user_id} already has the Role with the id {role_id}"
-                return res.error_400_bad_request(error_msg)
-
-            new_user_role = UserRoleModel.objects.create(user_id=user_id, role_id=role_id)
-            new_user_role.save()
-            return Response(UserRoleSerializer(new_user_role).data) # serialize in fn
+            result = role_service.create_item(request)
+            return Response(result)
+        except IntegrityError as exp:
+            return res.error_400_bad_request(exp)
         except Exception as exp:
             return res.error_500_internal_server_error(exp)
 
@@ -146,6 +128,7 @@ class UserRoleViewSet(ModelViewSet):
         """TODO: add description"""
         try:
             # service!
+            return Response(role_service.update_item(request, pk))
             user_id = request.data.get(DB_FIELD_USER_ID)
             role_id = request.data.get(DB_FIELD_ROLE_ID)
             

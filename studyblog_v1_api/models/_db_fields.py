@@ -3,6 +3,7 @@ DB_FIELD_ALL = "__all__"
 
 DB_FIELD_ROLE_NAME = "role_name"
 DB_FIELD_USER = "user"
+DB_FIELD_ROLE = "role"
 DB_FIELD_USER_ID = "user_id"
 DB_FIELD_ROLE_ID = "role_id"
 DB_FIELD_USERNAME = "username"

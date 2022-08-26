@@ -1,0 +1,15 @@
+{
+	"id": 188,
+	"content": "comment",
+	"blogpost_id": 5,
+	"responded_comment_id": 5,
+	"created": "12.12.2019",
+	"last_edit": "12.12.2019",
+	"creator": {
+		"id": 187,
+		"username": "Ada",
+		"role": ["role1", "role2"],
+		"is_superuser": false,
+		"is_staff": true
+	}
+}

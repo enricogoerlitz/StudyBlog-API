@@ -98,8 +98,6 @@ base_blogpost_details_query = """
 def fetch_blogpost_details(blogpost_id=None) -> str:
     # TODO: more details
     order_by_clause = "ORDER BY bp.created"
-    if not blogpost_id:
-        return f"{base_blogpost_details_query} {order_by_clause}"
     
     if type_check.is_int(blogpost_id):
         return f"{base_blogpost_details_query} WHERE ubp.id = {blogpost_id}"
@@ -107,9 +105,8 @@ def fetch_blogpost_details(blogpost_id=None) -> str:
     if type_check.is_list_or_tuple(blogpost_id):
         query = _add_IN_to_query(base_blogpost_details_query, "ubp.id", blogpost_id)
         return f"{query} {order_by_clause}"
-    print("TEST")
 
-    return base_blogpost_details_query
+    return f"{base_blogpost_details_query} {order_by_clause}"
 
 
 
@@ -135,6 +132,35 @@ def fetch_execute_user_roles(id) -> list[str]:
         fetch_user_roles(id), 
         formatter_func=lambda _, result: [obj[0] for obj in result]
     )
+
+
+base_blogpost_comment_query = """
+    SELECT
+        bpc.id, bpc.content, bpc.blogpost_id, 
+        bpc.blogpost_comment_id, bpc.created, 
+        bpc.last_edit, u.id AS user_id, u.username,
+        u.is_superuser, u.is_staff, 
+        r.role_name
+    FROM
+        studyblog_v1_api_blogpostcommentmodel bpc
+    LEFT JOIN
+        studyblog_v1_api_userprofilemodel u ON bpc.user_id = u.id
+    LEFT JOIN
+        studyblog_v1_api_userrolemodel ur ON u.id = ur.user_id
+    LEFT JOIN 
+        studyblog_v1_api_rolemodel r ON ur.role_id = r.id
+"""
+
+def fetch_blogpost_comment_details(comment_id=None) -> str:
+    if type_check.is_int(comment_id):
+        return f"{base_blogpost_comment_query} WHERE bpc.id = {comment_id}"
+    
+    if type_check.is_list_or_tuple(comment_id):
+        return _add_IN_to_query(base_blogpost_comment_query, "bpc.id", comment_id)
+    
+    return base_blogpost_comment_query
+
+
 
 
 def _add_IN_to_query(query, field: str, ids: Union[list, tuple]) -> str:
