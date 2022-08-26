@@ -1,4 +1,5 @@
 from django.db import IntegrityError
+from django.core.exceptions import ObjectDoesNotExist
 
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
@@ -127,60 +128,9 @@ class UserRoleViewSet(ModelViewSet):
     def update(self, request, pk, *args, **kwargs):
         """TODO: add description"""
         try:
-            # service!
-            return Response(role_service.update_item(request, pk))
-            user_id = request.data.get(DB_FIELD_USER_ID)
-            role_id = request.data.get(DB_FIELD_ROLE_ID)
-            
-            curr_user_role = UserRoleModel.objects.filter(id=pk)
-            if curr_user_role.count() == 0:
-                return res.error_400_bad_request(f"No UserRole with the id {pk} existing!")
-
-            if not user_id or not role_id:
-                if user_id is None and not role_id is None:
-                    return res.error_400_bad_request("The UserId was null. Please enter an UserId")
-                
-                if role_id is None and not user_id is None:
-                    return res.error_400_bad_request("The RoleId was null. Please enter an RoleId")
-                
-                return res.error_400_bad_request("The UserId and the RoleId was null. Please enter an UserId as well as an RoleId")
-
-            is_existing = UserRoleModel.objects.filter(user_id=user_id, role_id=role_id).exists()
-            if is_existing:
-                error_msg = f"Duplicate Key Error. The User with the id {user_id} already has the Role with the id {role_id}"
-                return res.error_400_bad_request(error_msg)
-
-            curr_user_role.update(user_id=user_id, role_id=role_id)
-            return Response(curr_user_role.values()[0])
-        except Exception as exp:
-            return res.error_500_internal_server_error(exp)
-    
-    def partial_update(self, request, pk, *args, **kwargs):
-        """TODO: add description"""
-        try:
-            # service!
-            user_id = request.data.get(DB_FIELD_USER_ID)
-            role_id = request.data.get(DB_FIELD_ROLE_ID)
-            
-            curr_user_role = UserRoleModel.objects.filter(id=pk)
-            if curr_user_role.count() == 0:
-                return res.error_400_bad_request(f"No UserRole with the id {pk} existing!")
-
-            if not user_id and not role_id:
-                return res.error_400_bad_request("The UserId and the RoleId was null. Please enter an UserId or an RoleId to update to update this UserRole.")
-
-            if not user_id:
-                user_id = curr_user_role.values()[0][DB_FIELD_USER_ID]
-
-            if not role_id:
-                role_id = curr_user_role.values()[0][DB_FIELD_ROLE_ID]
-            
-            is_existing = UserRoleModel.objects.filter(user_id=user_id, role_id=role_id).exists()
-            if is_existing:
-                error_msg = f"Duplicate Key Error. The User with the id {user_id} already has the Role with the id {role_id}"
-                return res.error_400_bad_request(error_msg)
-
-            curr_user_role.update(user_id=user_id, role_id=role_id)
-            return Response(curr_user_role.values()[0])
+            result = role_service.update_item(request, pk)
+            return Response(result)
+        except ObjectDoesNotExist:
+            return res.error_400_bad_request(f"UserRole object with id {pk} does not exist.")
         except Exception as exp:
             return res.error_500_internal_server_error(exp)
