@@ -14,6 +14,7 @@ from studyblog_v1_api.utils import response as res
 from studyblog_v1_api.permissions import UserProfilePermission, UserRolePermission, RolePermission
 from studyblog_v1_api.db import query, filter
 from studyblog_v1_api.services import role_service, user_service
+from studyblog_v1_api.serializers import serializer
 from studyblog_v1_api.models import (
     UserProfileModel,
     UserRoleModel,
@@ -54,6 +55,16 @@ class UserViewSet(ModelViewSet):
         try:
             result = user_service.get_item_list(request)
             return res.success(result)
+        except Exception as exp:
+            return res.error_500_internal_server_error(exp)
+    
+    def create(self, request, *args, **kwargs):
+        serializer_ = self.serializer_class(data=request.data)
+        if not serializer_.is_valid():
+            res.error_400_bad_request({"error": serializer_.errors})
+        try:
+            result = user_service.create_user(request, serializer_.data)
+            return res.created(result)
         except Exception as exp:
             return res.error_500_internal_server_error(exp)
 

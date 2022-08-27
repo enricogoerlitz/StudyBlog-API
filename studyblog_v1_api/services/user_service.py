@@ -11,6 +11,7 @@ from studyblog_v1_api.models import (
     DB_FIELD_PASSWORD,
     DB_FIELD_ID
 )
+from studyblog_v1_api.services import role_service
 from studyblog_v1_api.utils import type_check
 
 
@@ -27,7 +28,7 @@ def create_user(request, validated_data):
         passed_user_role_ids and
         isin_role(roles.ADMIN, request=request)
     ):
-        # validate roles! -> SELECT - IN() -> len() = len()
+        role_service.validate_role(passed_user_role_ids)
         if type_check.is_list_or_tuple(passed_user_role_ids):
             user_roles = list(passed_user_role_ids)
         else:
@@ -43,8 +44,8 @@ def create_user(request, validated_data):
     if created_user:
         for role in user_roles:
             UserRoleModel.objects.create(user_id=created_user.id, role_id=role)
-
-    return created_user
+    
+    return serializer.model_to_json(created_user, DB_FIELD_ID, DB_FIELD_USERNAME)
 
 def get_item_list(request):
     user_ids = _get_req_user_ids(request)

@@ -26,11 +26,6 @@ class UserProfileSerializer(ModelSerializer):
                 "style": {"input_type": "password"},
             }
         }
-
-    def create(self, validated_data, *args, **kwargs):
-        """Handle creating a new user"""
-        request = self._context["request"]
-        return user_service.create_user(request, validated_data)
     
     def update(self, instance, validated_data):
         """Handle updating an user"""

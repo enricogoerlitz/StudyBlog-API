@@ -91,7 +91,7 @@ def validate_composite_primary_keys(db_model, *keys):
                 return Response({"error": {"required fields": missing_required_fields}}, status=status.HTTP_400_BAD_REQUEST)
             
             if db_model.objects.filter(**db_key_value_map).exists():
-                return Response({"error": "The Object is still existing."})
+                return Response({"error": "Duplicate Key Error. This Object is still existing."})
             
             return func(view, request, *args, **kwargs)
         return wrapper
