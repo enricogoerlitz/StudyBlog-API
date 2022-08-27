@@ -12,7 +12,7 @@ class BlogPostModel(models.Model):
         null=False,
     )
     title = models.CharField(max_length=50, blank=False, unique=True)
-    content = models.CharField(max_length=2000, blank=False)
+    content = models.TextField(max_length=2000, blank=False)
     created = models.DateTimeField(default=datetime.now, null=False)
     last_edit = models.DateTimeField(auto_now=True, null=False)
 
@@ -39,7 +39,7 @@ class BlogPostCommentModel(models.Model):
         on_delete=models.CASCADE,
         null=True
     )
-    content = models.CharField(max_length=500, blank=False)
+    content = models.TextField(max_length=500, blank=False)
     created = models.DateTimeField(default=datetime.now, null=False)
     last_edit = models.DateTimeField(auto_now=True, null=False)
 
