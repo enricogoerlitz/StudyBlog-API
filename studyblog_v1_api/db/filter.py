@@ -26,7 +26,7 @@ base_user_details_query = """
 """
 
 
-def fetch_all_user_details(user_id=None) -> str:
+def fetch_user_details(user_id=None) -> str:
     # TODO: more details
     if type_check.is_int(user_id):
         single_user_query = f"{base_user_details_query} WHERE ur.user_id = {user_id}"

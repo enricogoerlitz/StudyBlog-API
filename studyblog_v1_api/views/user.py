@@ -13,7 +13,7 @@ from studyblog_v1_api.utils import response as res
 from studyblog_v1_api.utils.request import is_authenticated, isin_role
 from studyblog_v1_api.permissions import UserProfilePermission, UserRolePermission, RolePermission
 from studyblog_v1_api.db import query, filter
-from studyblog_v1_api.services import role_service
+from studyblog_v1_api.services import role_service, user_service
 from studyblog_v1_api.models import (
     UserProfileModel,
     UserRoleModel,
@@ -43,10 +43,12 @@ class UserViewSet(ModelViewSet):
         """
            /api/v1/profile/?details=true&user_id=1,2,4
         """
+
+        return user_service.get_item_list(request)
         user_ids = request.query_params.get("user_id")
         if user_ids:
             user_ids = user_ids.split(",")
-        return res.success(query.execute(filter.fetch_all_user_details(user_id=user_ids)))
+        return res.success(query.execute(filter.fetch_user_details(user_id=user_ids)))
 
 
         result = []
@@ -77,7 +79,7 @@ class UserViewSet(ModelViewSet):
         if details and details.lower() == "true":
             # error handling -> bei failing id finding!!!
             # + username!
-            return res.success(query.execute(filter.fetch_all_user_details(user_id=user_ids)))
+            return res.success(query.execute(filter.fetch_user_details(user_id=user_ids)))
 
         if user_ids:
             users = UserProfileModel.objects.filter(id__in=user_ids)
