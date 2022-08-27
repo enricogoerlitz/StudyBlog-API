@@ -25,6 +25,7 @@ class TestAPIView(APIView):
         })
 
 def init_db():
+    """"""
     # - - - - - - users - - - - - - 
     PASSWORD = "test"
     if not UserProfileModel.objects.filter(username="teddy").exists():
@@ -57,9 +58,9 @@ def init_db():
     }
 
     for username in user_roles_map:
-        user_id = UserProfileModel.objects.filter(username=username).values()[0]["id"]
+        user_id = UserProfileModel.objects.get(username=username).id
         for role_name in user_roles_map[username]:
-            role_id = RoleModel.objects.filter(role_name=role_name).values()[0]["id"]
+            role_id = RoleModel.objects.get(role_name=role_name).id
             if UserRoleModel.objects.filter(user_id=user_id, role_id=role_id).exists():
                 continue
             UserRoleModel.objects.create(user_id=user_id, role_id=role_id)
@@ -105,42 +106,42 @@ def init_db():
     blogpost_3 = BlogPostModel.objects.get(title=title_3)
 
     blogpost_comments = [
-            # blogpost 1
-            {
-                "user_id": user_4_user.id,
-                "blogpost_id": blogpost_1.id,
-                "content": "Ich liebe Schlumpfeis.\nUnd auch wenn ich damit langweilig klinge, Vanille ist auch super lecker!"
-            },
-            {
-                "user_id": user_5_user.id,
-                "blogpost_id": blogpost_1.id,
-                "content": "Ich liebe Schlumpfeis.\nUnd auch wenn ich damit langweilig klinge, Vanille ist auch super lecker!"
-            },
-            {
-                "user_id": user_5_user.id,
-                "blogpost_id": blogpost_1.id,
-                "content": "ICH SAGE NUR: SCHOKOEISSSSS!!!🥳"
-            },
+        # blogpost 1
+        {
+            "user_id": user_4_user.id,
+            "blogpost_id": blogpost_1.id,
+            "content": "Ich liebe Schlumpfeis.\nUnd auch wenn ich damit langweilig klinge, Vanille ist auch super lecker!"
+        },
+        {
+            "user_id": user_5_user.id,
+            "blogpost_id": blogpost_1.id,
+            "content": "Ich liebe Schlumpfeis.\nUnd auch wenn ich damit langweilig klinge, Vanille ist auch super lecker!"
+        },
+        {
+            "user_id": user_5_user.id,
+            "blogpost_id": blogpost_1.id,
+            "content": "ICH SAGE NUR: SCHOKOEISSSSS!!!🥳"
+        },
 
-            # blogpost 2
-            {
-                "user_id": user_6_user.id,
-                "blogpost_id": blogpost_2.id,
-                "content": "Großartig! I Like. :)"
-            },
+        # blogpost 2
+        {
+            "user_id": user_6_user.id,
+            "blogpost_id": blogpost_2.id,
+            "content": "Großartig! I Like. :)"
+        },
 
-            # blogpost 3
-            {
-                "user_id": user_1_user.id,
-                "blogpost_id": blogpost_3.id,
-                "content": "Ach... mir gehts genau so. Alles gut ;)."
-            },
-            {
-                "user_id": user_4_user.id,
-                "blogpost_id": blogpost_3.id,
-                "content": "[WERBUNG]: WIE DU IN 4 WOCHEN 80kg ABNEHMEN. KLICKE HIER!"
-            },
-        ]
+        # blogpost 3
+        {
+            "user_id": user_1_user.id,
+            "blogpost_id": blogpost_3.id,
+            "content": "Ach... mir gehts genau so. Alles gut ;)."
+        },
+        {
+            "user_id": user_4_user.id,
+            "blogpost_id": blogpost_3.id,
+            "content": "[WERBUNG]: WIE DU IN 4 WOCHEN 80kg ABNEHMEN. KLICKE HIER!"
+        },
+    ]
 
     for blogpost_comment in blogpost_comments:
         if BlogPostCommentModel.objects.filter(content=blogpost_comment["content"]).exists():

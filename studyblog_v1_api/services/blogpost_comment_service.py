@@ -12,8 +12,7 @@ def get_item_list(request):
     blogpost_comment_data = query.execute(filter.fetch_blogpost_comment_details())
     if len(blogpost_comment_data) == 0: return []
 
-    return [_get_comment_obj(comment) for comment in blogpost_comment_data]
-
+    return _get_blogpost_comment_items(blogpost_comment_data)
 
 def get_item(request, pk):
     if not filter.is_details(request):
@@ -23,7 +22,6 @@ def get_item(request, pk):
     if len(blogpost_comment_data) == 0: raise ObjectDoesNotExist()
 
     return _get_comment_obj(blogpost_comment_data[0])
-
 
 def update_item(request, pk):
     content = request.data.get("content")
@@ -36,6 +34,19 @@ def update_item(request, pk):
 
     return serializer.model_to_json(current_blogpost_comment)
 
+def _get_blogpost_comment_items(blogpost_comment_data):
+    result = []
+    added_comments = {}
+    for row in blogpost_comment_data:
+        comment_id = row["id"]
+        if not comment_id in added_comments:
+            added_comments[comment_id] = len(result)
+            result.append(_get_comment_obj(row))
+            continue
+        
+        result[added_comments[comment_id]]["creator"]["roles"].append(row["role_name"])
+    
+    return result
 
 def _get_comment_obj(data):
     return {
