@@ -1,6 +1,8 @@
 from django.db import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
 
+from rest_framework.response import Response
+
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.permissions import IsAuthenticated
@@ -43,8 +45,8 @@ class UserViewSet(ModelViewSet):
         """
            /api/v1/profile/?details=true&user_id=1,2,4
         """
-
-        return user_service.get_item_list(request)
+        res = user_service.get_item_list(request)
+        return Response({})
         user_ids = request.query_params.get("user_id")
         if user_ids:
             user_ids = user_ids.split(",")

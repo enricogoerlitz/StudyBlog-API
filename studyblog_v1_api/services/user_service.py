@@ -45,7 +45,7 @@ def get_item_list(request):
     users_data = query.execute(filter.fetch_user_details())
     if len(users_data) == 0: raise ObjectDoesNotExist()
 
-    return _get_user_objs(users_data)
+    return serializer.model_to_json(_get_user_objs(users_data))
 
 
 def get_item(request, pk):
@@ -55,7 +55,7 @@ def get_item(request, pk):
     user_data = query.execute(filter.fetch_user_details(pk))
     if len(user_data) == 0: raise ObjectDoesNotExist()
 
-    return _get_user_obj(user_data)
+    return serializer.model_to_json(_get_user_obj(user_data))
 
 
 def is_authenticated(request):

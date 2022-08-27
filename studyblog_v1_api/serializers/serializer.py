@@ -7,10 +7,15 @@ from studyblog_v1_api.utils import type_check
 
 
 def model_to_json(model, top_records=None):
+    print(type(model))
+    print(type(QuerySet()))
+    print(isinstance(model, QuerySet))
     if not isinstance(model, QuerySet):
-        return model_to_dict(model)
+        print("QUERYSET !!!!!")
+        return model
 
     model_values = model.values()
+    type(model_values)
     if not type_check.is_int(top_records, or_float=False): 
         return model_values
     
