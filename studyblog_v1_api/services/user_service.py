@@ -1,8 +1,16 @@
 from django.core.exceptions import ObjectDoesNotExist
 
 from studyblog_v1_api.db import query, filter, roles
-from studyblog_v1_api.serializers import serializer
-from studyblog_v1_api.models import UserProfileModel, UserRoleModel, RoleModel, DB_FIELD_ROLE_ID, DB_FIELD_USERNAME, DB_FIELD_PASSWORD
+from studyblog_v1_api.serializers import serializer 
+from studyblog_v1_api.models import (
+    UserProfileModel,
+    UserRoleModel,
+    RoleModel,
+    DB_FIELD_ROLE_ID,
+    DB_FIELD_USERNAME,
+    DB_FIELD_PASSWORD,
+    DB_FIELD_ID
+)
 from studyblog_v1_api.utils import type_check
 
 
@@ -39,23 +47,25 @@ def create_user(request, validated_data):
     return created_user
 
 def get_item_list(request):
-    if not filter.is_details(request):
-        return serializer.model_to_json(UserProfileModel.objects.all())
-    
-    users_data = query.execute(filter.fetch_user_details())
-    if len(users_data) == 0: raise ObjectDoesNotExist()
+    user_ids = _get_req_user_ids(request)
 
-    return serializer.model_to_json(_get_user_objs(users_data))
+    if not filter.is_details(request):
+        return serializer.model_to_json(UserProfileModel.objects.all().order_by("id"), DB_FIELD_ID, DB_FIELD_USERNAME)
+    
+    users_data = query.execute(filter.fetch_user_details(user_ids))
+    if len(users_data) == 0: return []
+
+    return _get_user_objs(users_data)
 
 
 def get_item(request, pk):
     if not filter.is_details(request):
-        return serializer.model_to_json(UserProfileModel.objects.get(id=pk))
+        return serializer.model_to_json(UserProfileModel.objects.get(id=pk), DB_FIELD_ID, DB_FIELD_USERNAME)
     
     user_data = query.execute(filter.fetch_user_details(pk))
     if len(user_data) == 0: raise ObjectDoesNotExist()
-
-    return serializer.model_to_json(_get_user_obj(user_data))
+    
+    return _get_user_objs(user_data)[0]
 
 
 def is_authenticated(request):
@@ -100,11 +110,10 @@ def _get_user_objs(users_data):
             continue
         
         result[added_users[user_id]]["roles"].append(row["role_name"])
-    
     return result
 
 def _get_user_obj(user_data):
-    return{
+    return {
         "id": user_data["id"],
         "username": user_data["username"],
         "is_superuser": user_data["is_superuser"],
@@ -131,3 +140,13 @@ def _validate_isin_role_inputs(auth_roles, request, id, auth_way):
             raise ValueError(f"The length of the roles list is 0.")
     elif not isinstance(auth_roles, str):
         raise TypeError("No valid roles passed. Please pass one role as string or multiple roles as list of strings.")
+
+def _get_req_user_ids(request):
+    user_ids = request.query_params.get("user_id")
+    if not user_ids: return None
+
+    user_ids = user_ids.split(",")
+    for id in user_ids:
+        if not type_check.is_int(id, or_float=False):
+            raise ValueError(f"The passed id {id} is invalid!")
+    return user_ids if len(user_ids) > 1 else user_ids[0]

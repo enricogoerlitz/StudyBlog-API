@@ -1,30 +1,35 @@
-from django.core import serializers
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Model
 from django.forms.models import model_to_dict
+from django.contrib.auth.models import AbstractBaseUser
+
+
 
 from studyblog_v1_api.utils import type_check
 
 
-def model_to_json(model, top_records=None):
-    print(type(model))
-    print(type(QuerySet()))
-    print(isinstance(model, QuerySet))
+def model_to_json(model, *fields, **kwargs):
+    if not isinstance(model, (QuerySet, Model, AbstractBaseUser)):
+        raise ValueError("Detected an unexpected model type by parsing the model to JSON.")
+
     if not isinstance(model, QuerySet):
-        print("QUERYSET !!!!!")
-        return model
+        if len(fields) == 0: return model_to_dict(model)
+        return {
+            field.name: getattr(model, field.name)
+            for field in model._meta.fields if field.name in fields
+        }
 
-    model_values = model.values()
-    type(model_values)
-    if not type_check.is_int(top_records, or_float=False): 
-        return model_values
+    top = kwargs.get("top")
+    models = model.values(*fields) # [model_to_dict(m) for m in model]
+    if not type_check.is_int(top, or_float=False): 
+        return models
     
-    if top_records != 1:
-        return model_values[:top_records]
+    if top != 1:
+        return models[:top]
 
-    if len(model_values) == 0:
+    if len(models) == 0:
         raise ObjectDoesNotExist("Object does not exists.")
 
-    return model_values[0]
+    return models[0]
     
 

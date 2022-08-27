@@ -1,6 +1,5 @@
 from rest_framework.serializers import ModelSerializer
 
-from studyblog_v1_api.services import user_service
 from studyblog_v1_api.utils import type_check
 from studyblog_v1_api.db import roles
 from studyblog_v1_api.models import (

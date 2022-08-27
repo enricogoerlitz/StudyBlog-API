@@ -16,7 +16,7 @@ def is_details(request):
 
 base_user_details_query = """
     SELECT 
-        ur.user_id, u.username, ur.role_id, r.role_name, u.is_superuser, u.is_staff
+        u.id, u.username, ur.role_id, r.role_name, u.is_superuser, u.is_staff
     FROM 
         studyblog_v1_api_userrolemodel ur
     JOIN 
