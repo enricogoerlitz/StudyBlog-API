@@ -9,6 +9,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.filters import SearchFilter
 
 from studyblog_v1_api.serializers import UserProfileSerializer
+from studyblog_v1_api.utils.request import validate_composite_primary_keys
 from studyblog_v1_api.utils import response as res
 from studyblog_v1_api.permissions import UserProfilePermission, UserRolePermission, RolePermission
 from studyblog_v1_api.db import query, filter
@@ -18,8 +19,6 @@ from studyblog_v1_api.models import (
     UserRoleModel,
     RoleModel,
     DB_FIELD_USERNAME,
-    DB_FIELD_USER_ID,
-    DB_FIELD_ROLE_ID,
     DB_FIELD_ROLE_NAME,
 )
 from studyblog_v1_api.serializers import (
@@ -70,8 +69,8 @@ class RoleViewSet(ModelViewSet):
     serializer_class = RoleSerializer
     queryset = RoleModel.objects.all()
     permission_classes = (IsAuthenticated, RolePermission)
-    # filter_backends = (SearchFilter,)
-    # search_fields = (DB_FIELD_ROLE_NAME,)
+    filter_backends = (SearchFilter,)
+    search_fields = (DB_FIELD_ROLE_NAME,)
 
 
 class UserRoleViewSet(ModelViewSet):
@@ -81,6 +80,7 @@ class UserRoleViewSet(ModelViewSet):
     queryset = UserRoleModel.objects.all()
     permission_classes = (IsAuthenticated, UserRolePermission)
 
+    @validate_composite_primary_keys(UserRoleModel, "user", "role")
     def create(self, request, *args, **kwargs):
         """TODO: add description"""
         try:
@@ -91,6 +91,7 @@ class UserRoleViewSet(ModelViewSet):
         except Exception as exp:
             return res.error_500_internal_server_error(exp)
 
+    @validate_composite_primary_keys(UserRoleModel, "user", "role")
     def update(self, request, pk, *args, **kwargs):
         """TODO: add description"""
         try:

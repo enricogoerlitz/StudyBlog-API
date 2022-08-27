@@ -2,6 +2,7 @@ from rest_framework.serializers import ModelSerializer
 
 from studyblog_v1_api.utils import type_check
 from studyblog_v1_api.db import roles
+from studyblog_v1_api.services import user_service
 from studyblog_v1_api.models import (
     UserProfileModel,
     RoleModel,
@@ -28,9 +29,6 @@ class UserProfileSerializer(ModelSerializer):
 
     def create(self, validated_data, *args, **kwargs):
         """Handle creating a new user"""
-        # alles in user_service!
-
-        # how catch errors? -> try-catch decorator with response?
         request = self._context["request"]
         return user_service.create_user(request, validated_data)
     

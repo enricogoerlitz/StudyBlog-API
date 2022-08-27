@@ -2,6 +2,8 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from studyblog_v1_api.db import query, filter
+from studyblog_v1_api.models.user import UserRoleModel
+from studyblog_v1_api.services import user_service
 
 
 GET = "GET"
@@ -56,56 +58,18 @@ def isin_role(auth_roles, auth_way="or"):
     """Decorator
     
     """
-    # NEW!!! -> user_service
     def decorator(func):
         def wrapper(view, request, *args, **kwargs):
-            if not request.user.is_authenticated:
-                raise Exception("User is not authenticated!")
-
-            if not auth_roles:
-                raise ValueError("You need to pass any roles to this function.")
-            
-            if not auth_way in "or and":
-                raise ValueError("The auth_way must be 'or' or 'and'.")
-            
-            is_list = False
-            if isinstance(auth_roles, list) or isinstance(auth_roles, tuple):
-                if len(auth_roles) == 0:
-                    raise ValueError(f"The length of the roles list is 0.")
-                is_list = True
-            
-            if not is_list and not isinstance(auth_roles, str):
-                raise TypeError("No valid roles passed. Please pass one role as string or multiple roles as list of strings.")
-
-            user_roles = filter.fetch_execute_user_roles(request.user.id)
-
+            isin_result = user_service.isin_role(auth_roles, request, auth_way=auth_way)
             access_denied_response = Response({"error": "Access denied. User hasn't the needed permission to access this resource."}, status=status.HTTP_401_UNAUTHORIZED)
             access_granted_response = lambda: func(view, request, *args, **kwargs)
-            if auth_way == "or":
-                if is_list:
-                    for role in auth_roles:
-                        if role in user_roles:
-                            return access_granted_response()
-                    return access_denied_response
-
-                if auth_roles in user_roles:
-                    return access_granted_response()
-                return access_denied_response
-            
-            if is_list:
-                for role in auth_roles:
-                    if not role in user_roles:
-                        return access_denied_response
-                return access_granted_response()
-
-            if auth_roles in user_roles:
-                return access_granted_response()
-            return access_denied_response
+            return access_granted_response() if isin_result else access_denied_response
         return wrapper
     return decorator
 
                 
 def is_authenticated(func):
+    """TODO: comment"""
     def wrapper(view, request, *args, **kwargs):
         if request.user.is_authenticated:
             return func(view, request, *args, **kwargs)
@@ -114,8 +78,22 @@ def is_authenticated(func):
 
 
 
-def validate_composite_primary_keys(keys, table):
-    # extract keys values form query_params with the 'keys' above given
-    # arr = ["user_id", "role_id"] -> in func query_params -> d = {column: request.query_params.get(columns) for column in arr}
-    # Model.objects.filter(**d).count() > 0 -> return error-response
-    pass
+def validate_composite_primary_keys(db_model, *keys):
+    def decorator(func):
+        def wrapper(view, request, *args, **kwargs):
+            db_key_value_map = {}
+            for key in request.data:
+                value = request.data[key]
+                if key in keys and value: db_key_value_map[key] = value
+
+            if len(db_key_value_map) != len(keys):
+                missing_required_fields = [missing_key for missing_key in keys if not missing_key in db_key_value_map]
+                return Response({"error": {"required fields": missing_required_fields}}, status=status.HTTP_400_BAD_REQUEST)
+            
+            if db_model.objects.filter(**db_key_value_map).exists():
+                return Response({"error": "The Object is still existing."})
+            
+            return func(view, request, *args, **kwargs)
+        return wrapper
+    return decorator
+            

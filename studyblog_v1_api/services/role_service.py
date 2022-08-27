@@ -11,7 +11,7 @@ from studyblog_v1_api.models import (
 def create_item(request):
     user_id, role_id = _get_user_role_data(request)
 
-    _validate_existing(user_id, role_id)
+    #_validate_existing(user_id, role_id)
 
     new_user_role = UserRoleModel.objects.create(user_id=user_id, role_id=role_id)
     new_user_role.save()
@@ -21,7 +21,7 @@ def create_item(request):
 
 def update_item(request, pk):
     user_id, role_id = _get_user_role_data(request)
-    _validate_existing(user_id, role_id)
+    #_validate_existing(user_id, role_id)
 
     current_user_role = UserRoleModel.objects.get(id=pk)
     current_user_role.user_id = user_id
@@ -32,8 +32,8 @@ def update_item(request, pk):
 
 
 def _get_user_role_data(request):
-    user_id = request.data.get(DB_FIELD_USER_ID) or request.data.get(DB_FIELD_USER)
-    role_id = request.data.get(DB_FIELD_ROLE_ID) or request.data.get(DB_FIELD_ROLE)
+    user_id = request.data.get(DB_FIELD_USER)
+    role_id = request.data.get(DB_FIELD_ROLE)
     _validate_data(user_id, role_id)
 
     return user_id, role_id
