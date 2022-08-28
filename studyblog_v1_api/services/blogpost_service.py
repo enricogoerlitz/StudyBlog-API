@@ -5,11 +5,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from studyblog_v1_api.models import BlogPostModel
 from studyblog_v1_api.serializers import serializer
 from studyblog_v1_api.db import query, filter
-from studyblog_v1_api.models import (
-    DB_FIELD_CREATED,
-    DB_FIELD_USER_ID,
-    DB_FIELD_USER,
-)
 from studyblog_v1_api.utils.request import PUT
 
 
@@ -43,6 +38,7 @@ def update_item(request, pk):
         raise ValueError("No title and no content where passed.")
     
     current_blogpost = BlogPostModel.objects.get(id=pk)
+
     if request.method == PUT and (not title or not content):
         raise ValueError("For PUT requests are the fields title and content required.")
     
@@ -122,4 +118,5 @@ def _update_save_blogpost(blogpost, title, content):
     if title: blogpost.title = title
     if content: blogpost.content = content
     blogpost.save()
+    
     return serializer.model_to_json(blogpost)

@@ -6,10 +6,11 @@ from typing import Any, Union
 from django.db import connection
 
 
-def execute(query, formatter_func=None, *args, **kwargs) -> Union[list[dict[str, Any]], Any]:
-    """TODO: add description"""
+def execute(query, formatter_func=None, *args, **kwargs) -> Any:
+    """TODO: add description list[dict[str, Any]"""
     cursor = connection.cursor()
     result = cursor.execute(query, *args, **kwargs)
+    
     if formatter_func:
         return formatter_func(cursor, result)
     return serialize_query(cursor, result)

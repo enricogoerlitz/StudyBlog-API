@@ -1,9 +1,9 @@
 """TODO: add description"""
 
+from typing import Union
+
 from rest_framework import status
 from rest_framework.response import Response
-
-from typing import Union
 
 
 def success(obj: dict):

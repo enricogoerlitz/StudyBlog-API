@@ -3,9 +3,8 @@
 from rest_framework.permissions import BasePermission
 
 from studyblog_v1_api.db import query, roles
-from studyblog_v1_api.models import RoleModel
 from studyblog_v1_api.services import user_service
-from studyblog_v1_api.utils.request import GET, POST, PUT, PATCH, DELETE
+from studyblog_v1_api.utils.request import GET
 
 
 class UserProfilePermission(BasePermission):

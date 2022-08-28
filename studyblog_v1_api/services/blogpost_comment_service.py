@@ -3,7 +3,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 
 from studyblog_v1_api.models import BlogPostCommentModel
-from studyblog_v1_api.serializers import BlogPostCommentSerializer, serializer
+from studyblog_v1_api.serializers import serializer
 from studyblog_v1_api.db import query, filter
 
 
@@ -30,8 +30,7 @@ def get_item(request, pk):
 def update_item(request, pk):
     """TODO: add description"""
     content = request.data.get("content")
-    if not content:
-        raise ValueError("Field content is required.")
+    if not content: raise ValueError("Field content is required.")
     
     current_blogpost_comment = BlogPostCommentModel.objects.get(id=pk)
     current_blogpost_comment.content = content

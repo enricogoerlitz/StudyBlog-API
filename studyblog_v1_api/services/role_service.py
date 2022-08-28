@@ -1,14 +1,12 @@
 """TODO: add description"""
 
 from django.core.exceptions import ObjectDoesNotExist
-from studyblog_v1_api.models.user import RoleModel
 
+from studyblog_v1_api.models.user import RoleModel
 from studyblog_v1_api.serializers import serializer
 from studyblog_v1_api.utils import type_check
 from studyblog_v1_api.models import (
     UserRoleModel, 
-    DB_FIELD_USER_ID, 
-    DB_FIELD_ROLE_ID,
     DB_FIELD_USER,
     DB_FIELD_ROLE
 )
@@ -18,8 +16,6 @@ def create_item(request):
     """TODO: add description"""
     user_id, role_id = _get_user_role_data(request)
 
-    #_validate_existing(user_id, role_id)
-
     new_user_role = UserRoleModel.objects.create(user_id=user_id, role_id=role_id)
     new_user_role.save()
 
@@ -28,7 +24,6 @@ def create_item(request):
 def update_item(request, pk):
     """TODO: add description"""
     user_id, role_id = _get_user_role_data(request)
-    #_validate_existing(user_id, role_id)
 
     current_user_role = UserRoleModel.objects.get(id=pk)
     current_user_role.user_id = user_id
@@ -41,7 +36,7 @@ def validate_role(role_id):
     """TODO: add description"""
     if type_check.is_int(role_id, or_float=False):
         if not RoleModel.objects.filter(id=role_id).exists():
-            raise ObjectDoesNotExist(f"The role_id {role_id} does not exits.")
+            raise ObjectDoesNotExist(f"The role {role_id} does not exits.")
         return
     
     if type_check.is_list_or_tuple(role_id):
@@ -51,7 +46,8 @@ def validate_role(role_id):
             raise ObjectDoesNotExist({"error": {"roles does not exists": not_existing_roles}})
         return
 
-    raise ValueError("Unexpected value as role_id.")
+    raise ValueError("Unexpected value as role.")
+
 def _get_user_role_data(request):
     """TODO: add description"""
     user_id = request.data.get(DB_FIELD_USER)
@@ -63,6 +59,7 @@ def _get_user_role_data(request):
 def _validate_data(user_id, role_id):
     """TODO: add description"""
     if user_id and role_id: return
+    
     if user_id is None and role_id:
         raise ValueError("The field user_id is required.")
     

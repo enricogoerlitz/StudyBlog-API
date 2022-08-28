@@ -21,15 +21,11 @@ def model_to_json(model, *fields, **kwargs):
         }
 
     top = kwargs.get("top")
-    models = model.values(*fields) # [model_to_dict(m) for m in model]
-    if not type_check.is_int(top, or_float=False): 
-        return models
-    
-    if top != 1:
-        return models[:top]
+    models = model.values(*fields)
 
-    if len(models) == 0:
-        raise ObjectDoesNotExist("Object does not exists.")
+    if not type_check.is_int(top, or_float=False): return models
+    if top != 1: return models[:top]
+    if len(models) == 0: raise ObjectDoesNotExist("Object does not exists.")
 
     return models[0]
     

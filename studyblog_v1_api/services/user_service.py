@@ -3,7 +3,10 @@
 from django.core.exceptions import ObjectDoesNotExist
 
 from studyblog_v1_api.db import query, filter, roles
+from studyblog_v1_api.utils.exceptions import UnauthorizedException
 from studyblog_v1_api.serializers import serializer 
+from studyblog_v1_api.services import role_service
+from studyblog_v1_api.utils import type_check
 from studyblog_v1_api.models import (
     UserProfileModel,
     UserRoleModel,
@@ -13,18 +16,15 @@ from studyblog_v1_api.models import (
     DB_FIELD_PASSWORD,
     DB_FIELD_ID
 )
-from studyblog_v1_api.services import role_service
-from studyblog_v1_api.utils import type_check
 
 
 def create_user(request, validated_data):
     """Handle creating a new user"""
     passed_user_role_ids = request.data.get(DB_FIELD_ROLE_ID)
     user_roles = []
-    # raise error when error
+    
     if passed_user_role_ids and not is_authenticated(request):
-        # custom exception!
-        raise Exception("It was passed an role id, but only admins!")
+        raise UnauthorizedException("It was passed role data, but only admins can set role data.")
         
     if (
         passed_user_role_ids and
@@ -43,9 +43,10 @@ def create_user(request, validated_data):
         password=validated_data.get(DB_FIELD_PASSWORD),
     )
 
-    if created_user:
-        for role in user_roles:
-            UserRoleModel.objects.create(user_id=created_user.id, role_id=role)
+    if not created_user: raise Exception("User not created. Unexpected server error.")
+
+    for role in user_roles:
+        UserRoleModel.objects.create(user_id=created_user.id, role_id=role)
     
     return serializer.model_to_json(created_user, DB_FIELD_ID, DB_FIELD_USERNAME)
 
@@ -96,10 +97,10 @@ def isin_role(auth_roles, request=None, id=None, auth_way="or"):
     
     if is_list:
         for role in auth_roles:
-            if not role in user_roles: return True # False?
+            if not role in user_roles: return True
         return False
 
-    if auth_roles in user_roles:  return True
+    if auth_roles in user_roles: return True
     return False
 
 def _get_user_objs(users_data):

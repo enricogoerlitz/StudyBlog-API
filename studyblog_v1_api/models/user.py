@@ -9,12 +9,9 @@ class UserProfileManager(BaseUserManager):
 
     def create_user(self, username, password=None):
         """Create a new user profile"""
-
-        if not username:
-            raise ValueError("User must have an username")
+        if not username: raise ValueError("User must have an username")
         
         user = self.model(username=username)
-
         user.set_password(password)
         user.save(using=self._db)
 
@@ -22,7 +19,6 @@ class UserProfileManager(BaseUserManager):
 
     def create_superuser(self, username, password):
         """Create and save a new superuser with given details"""
-
         user = self.create_user(username, password)
         user.is_superuser = True
         user.is_staff = True
@@ -33,7 +29,6 @@ class UserProfileManager(BaseUserManager):
 
 class UserProfileModel(AbstractBaseUser, PermissionsMixin):
     """Database model for users in the system"""
-
     username = models.CharField(max_length=30, unique=True)
     
     # is required of AbstractBaseUser

@@ -1,14 +1,13 @@
 """TODO: add description"""
 
 from django.core.exceptions import ObjectDoesNotExist
+
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.filters import SearchFilter
 
-from studyblog_v1_api.db import query, filter
 from studyblog_v1_api.utils import response as res
-from studyblog_v1_api.serializers import BlogPostCommentSerializer, BlogPostSerializer
+from studyblog_v1_api.serializers import BlogPostSerializer
 from studyblog_v1_api.permissions import BlogPostPermission
 from studyblog_v1_api.models import BlogPostCommentModel, BlogPostModel
 from studyblog_v1_api.services import blogpost_service, blogpost_comment_service
