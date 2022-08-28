@@ -1,4 +1,6 @@
-"""TODO: add description"""
+"""
+Module for db field names as constants.
+"""
 
 DB_FIELD_ID = "id"
 DB_FIELD_ALL = "__all__"

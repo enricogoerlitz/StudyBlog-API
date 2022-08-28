@@ -1,9 +1,11 @@
-"""TODO: add description"""
+"""
+API-Endpoints for testing the API.
+"""
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from studyblog_v1_api.db import query, roles
+from studyblog_v1_api.db import roles
 from studyblog_v1_api.models import (
     RoleModel,
     UserProfileModel,
@@ -14,7 +16,7 @@ from studyblog_v1_api.models import (
 
 
 class TestAPIView(APIView):
-    """Tests the API without any permissions"""
+    """Tests the API without any permissions."""
 
     def get(self, request, format=None):
         init_db()
@@ -25,8 +27,9 @@ class TestAPIView(APIView):
             "message": "You successful send a request to this api! Use /v1/api/login to get your token or /v1/api/register to register and get your token.",
         })
 
+
 def init_db():
-    """TODO: add description"""
+    """Initialize data in the db."""
     # - - - - - - users - - - - - - 
     PASSWORD = "test"
     if not UserProfileModel.objects.filter(username="teddy").exists():
@@ -148,12 +151,10 @@ def init_db():
         if BlogPostCommentModel.objects.filter(content=blogpost_comment["content"]).exists():
             continue
         BlogPostCommentModel.objects.create(**blogpost_comment)
-    
 
-        
     
 def test_orm():
-    """TODO: add description"""
+    """Just test the orm."""
     qs = UserRoleModel.objects.all().select_related("user", "role")
     print("- - - - - - - - TEST ORM START- - - - - - - -")
     print(qs.query)

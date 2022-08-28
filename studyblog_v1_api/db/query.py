@@ -2,12 +2,14 @@
 Module for custom db queries.
 """
 
-from typing import Any, Union
+from typing import Any, Callable
+
 from django.db import connection
+from django.db.backends.utils import CursorWrapper
 
 
-def execute(query, formatter_func=None, *args, **kwargs) -> Any:
-    """TODO: add description list[dict[str, Any]"""
+def execute(query: str, formatter_func: Callable[[CursorWrapper, Any], Any] = None, *args, **kwargs) -> Any:
+    """Execute a custom SQL query on the database. Returns the prepared result."""
     cursor = connection.cursor()
     result = cursor.execute(query, *args, **kwargs)
     
@@ -16,7 +18,7 @@ def execute(query, formatter_func=None, *args, **kwargs) -> Any:
     return serialize_query(cursor, result)
 
 
-def serialize_query(cursor, result):
-    """TODO: add description"""
+def serialize_query(cursor: CursorWrapper, result: Any) -> list[dict[str, Any]]:
+    """Returns a prepared db query result"""
     columns = [column[0] for column in cursor.description]
     return [dict(zip(columns, obj)) for obj in result]

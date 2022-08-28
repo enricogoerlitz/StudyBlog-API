@@ -1,6 +1,13 @@
-"""TODO: add description"""
+"""
+Service for handling BlogPost operations.
+"""
+
+from typing import Any
 
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Model
+
+from rest_framework.request import Request
 
 from studyblog_v1_api.models import BlogPostModel
 from studyblog_v1_api.serializers import serializer
@@ -8,8 +15,12 @@ from studyblog_v1_api.db import query, filter
 from studyblog_v1_api.middleware.request import PUT
 
 
-def get_item_list(request):
-    """TODO: add description"""
+def get_item_list(request: Request) -> list[dict[str, Any]]:
+    """
+    Returns a list of blogposts.
+    If the request query params contains the param 'details=true', it returns a list of blogposts with details (user, user roles and comments).
+    Otherwise only the blogpost data.
+    """
     if not filter.is_details(request):
         return serializer.model_to_json(BlogPostModel.objects.all())
     
@@ -19,8 +30,13 @@ def get_item_list(request):
     return _get_blogpost_items(blogpost_data)
 
 
-def get_item(request, pk):
-    """TODO: add description"""
+def get_item(request: Request, pk: int) -> dict[str, Any]:
+    """
+    Returns an serialized BlogPost object.
+    Raises an ObjectDoesNotExist exception, if the object does not existing.
+    If the request query params contains the param 'details=true', it returns the Blogpost with details (user, user roles and comments).
+    Otherwise only the BlogPostComment data.
+    """
     if not filter.is_details(request):
         return serializer.model_to_json(BlogPostModel.objects.get(id=pk))
 
@@ -30,8 +46,13 @@ def get_item(request, pk):
     return _get_blogpost_obj(blogpost_data[0])
     
 
-def update_item(request, pk):
-    """TODO: add description"""
+def update_item(request: Request, pk: int) -> dict[str, Any]:
+    """
+    Handle updating a BlogPost.
+    Raises an ValueError, if the 'title' and the 'content' is blank.
+    Raises an ValueError, of the request method is put and the 'title' or the 'content' is blank.
+    Raises an ObjectDoesNotExits exception, if the object does not existing.
+    """
     title = request.data.get("title")
     content = request.data.get("content")
     if not title and not content:
@@ -45,9 +66,9 @@ def update_item(request, pk):
     return _update_save_blogpost(current_blogpost, title, content)
 
 
-def _get_blogpost_items(blogpost_data):
-    """TODO: add description"""
-    result = []
+def _get_blogpost_items(blogpost_data: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Returns a prepared list of detailed BlogPosts."""
+    result: list[dict[str, Any]] = []
     added_blogposts = {}
     added_comments = {}
     for row in blogpost_data:
@@ -77,8 +98,9 @@ def _get_blogpost_items(blogpost_data):
 
     return result
 
-def _get_blogpost_obj(data):
-    """TODO: add description"""
+
+def _get_blogpost_obj(data: dict[str, Any]) -> dict[str, Any]:
+    """Returns a detailed BlogPost object."""
     return {
         "id": data["blogpost_id"],
         "title": data["blogpost_title"],
@@ -95,8 +117,9 @@ def _get_blogpost_obj(data):
         "comments": [] if not data["comment_id"] else [_get_blogpost_comment_obj(data)]
     }
 
-def _get_blogpost_comment_obj(data):
-    """TODO: add description"""
+
+def _get_blogpost_comment_obj(data: dict[str, Any]) -> dict[str, Any]:
+    """Returns a detailed BlogPostComment object."""
     return {
         "id": data["comment_id"],
         "content": data["comment_content"],
@@ -113,8 +136,8 @@ def _get_blogpost_comment_obj(data):
     }
 
 
-def _update_save_blogpost(blogpost, title, content):
-    """TODO: add description"""
+def _update_save_blogpost(blogpost: Model, title: str, content: str) -> dict[str, Any]:
+    """Handle generic updating and saving BlogPost."""
     if title: blogpost.title = title
     if content: blogpost.content = content
     blogpost.save()

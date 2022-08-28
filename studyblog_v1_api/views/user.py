@@ -35,14 +35,30 @@ from studyblog_v1_api.serializers import (
 
 
 class UserViewSet(ModelViewSet):
-    """Handle creating, updating and filtering profiles"""
+    """Handle UserProfile CRUD-Operations"""
     serializer_class = UserProfileSerializer
     queryset = UserProfileModel.objects.all()
     authentication_classes = (TokenAuthentication,)
     permission_classes = (UserProfilePermission,)
 
+    def list(self, request, *args, **kwargs):
+        """
+        Handle GET requests.
+        /api/v1/user/
+        /api/v1/user/?details=true&user_id=1,2,4
+        """
+        try:
+            result = user_service.get_item_list(request)
+            return res.success(result)
+        except Exception as exp:
+            return res.error_500_internal_server_error(exp)
+
     def retrieve(self, request, pk, *args, **kwargs):
-        """TODO: add description"""
+        """
+        Handle GET by ID requests.
+        /api/v1/user/{id}
+        /api/v1/user/{id}/details=true
+        """
         try:
             result = user_service.get_item(request, pk)
             return res.success(result)
@@ -50,20 +66,9 @@ class UserViewSet(ModelViewSet):
             return res.error_400_bad_request(f"User with the id {pk} does not exist")
         except Exception as exp:
             return res.error_500_internal_server_error(exp)
-        
-
-    def list(self, request, *args, **kwargs):
-        """
-           /api/v1/profile/?details=true&user_id=1,2,4
-        """
-        try:
-            result = user_service.get_item_list(request)
-            return res.success(result)
-        except Exception as exp:
-            return res.error_500_internal_server_error(exp)
     
     def create(self, request, *args, **kwargs):
-        """TODO: add description"""
+        """Handle POST requests."""
         serializer_ = self.serializer_class(data=request.data)
         if not serializer_.is_valid():
             res.error_400_bad_request({"error": serializer_.errors})
@@ -77,12 +82,12 @@ class UserViewSet(ModelViewSet):
 
 
 class UserAuthTokenApiView(ObtainAuthToken):
-    """API-Endpoint for receiving authentication token"""
+    """API-Endpoint for receiving authentication token."""
     renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
 
 
 class VisitorAuthTokenApiView(APIView):
-    """TODO: add description"""
+    """Handle login as visitor."""
 
     def get(self, request, *args, **kwargs):
         base_url = request.build_absolute_uri().replace("visitor", "")
@@ -92,7 +97,7 @@ class VisitorAuthTokenApiView(APIView):
 
 
 class RoleViewSet(ModelViewSet):
-    """TODO: add description"""
+    """Handle Role CRUD-Operations"""
     serializer_class = RoleSerializer
     queryset = RoleModel.objects.all()
     filter_backends = (SearchFilter,)
@@ -102,7 +107,7 @@ class RoleViewSet(ModelViewSet):
 
 
 class UserRoleViewSet(ModelViewSet):
-    """TODO: add description"""
+    """Handle UserRole CRUD-Operations"""
     serializer_class = UserRoleSerializer
     queryset = UserRoleModel.objects.all()
     authentication_classes = (TokenAuthentication,)
@@ -110,7 +115,7 @@ class UserRoleViewSet(ModelViewSet):
 
     @validate_composite_primary_keys(UserRoleModel, "user", "role")
     def create(self, request, *args, **kwargs):
-        """TODO: add description"""
+        """Handle POST requests."""
         try:
             result = role_service.create_item(request)
             return res.success(result)
@@ -121,7 +126,7 @@ class UserRoleViewSet(ModelViewSet):
 
     @validate_composite_primary_keys(UserRoleModel, "user", "role")
     def update(self, request, pk, *args, **kwargs):
-        """TODO: add description"""
+        """Handle PUT|PATCH requests."""
         try:
             result = role_service.update_item(request, pk)
             return res.updated(result)

@@ -1,8 +1,19 @@
-"""TODO: add description"""
+# mypy: ignore-errors
+"""
+Module for request middleware as decorators.
+"""
+
+from typing import Any, Callable, Union
+
+from django.db.models import Model
+
+from rest_framework.request import Request
 
 from studyblog_v1_api.services import user_service
 from studyblog_v1_api.utils import response as res
 
+
+# HTTP-Methods
 
 GET = "GET"
 POST = "POST"
@@ -11,50 +22,17 @@ PATCH = "PATCH"
 DELETE = "DELETE"
 
 
-class ValidDataWrapper:
-    def __init__(self, data, error_msg=None):
-        if data is None and error_msg is None:
-            raise ValueError("You need to add an error message, if the data is None")
+# Middleware decorators
 
-        self.data = data
-        self.is_valid = not data is None
-        self.errors = error_msg
-
-
-def get_id_obj(model, Serializer, auto_exe=True):
+def isin_role(auth_roles: Union[str, list[str], tuple[str]], auth_way: str = "or") -> Any: 
     """
-    Decorator: Checks, whether an id was passed the a get request.
-
-    Args:
-        model (DB_Model): an DB Model
-        Serializer (Model Serializer): an Model serializer to serialize the model
+    Checks, whether the user is in the passed role. 
+    It returns an 401-unauthorized Response, of the user is not in the given roles.
+    Otherwise (if the user is in role) the view will be executed normally. 
     """
-    def decorator(func):
-        def wrapper(view, request, *args, **kwargs):
-            id = request.query_params.get("id")
-            if not id: return func(view, *args, **kwargs)
 
-            try:
-                obj = model.objects.get(pk=id)
-                id_obj = Serializer(obj, many=False).data
-
-                if auto_exe: return res.success(id_obj)
-
-                return func(view, request, ValidDataWrapper(id_obj), *args, **kwargs)
-            except Exception:
-                err_msg = f"Could not find an object with the id {id}"
-                if auto_exe:
-                    return res.error_400_bad_request({"error": err_msg})
-
-                return func(view, request, ValidDataWrapper(None, err_msg), *args, **kwargs)
-        return wrapper
-    return decorator
-
-def isin_role(auth_roles, auth_way="or"): 
-    """TODO: add description"""
-
-    def decorator(func):
-        def wrapper(view, request, *args, **kwargs):
+    def decorator(func: Callable[[Any, Request], Any]) -> Any:
+        def wrapper(view: Any, request: Request, *args, **kwargs) -> Any:
             isin_result = user_service.isin_role(auth_roles, request, auth_way=auth_way)
 
             access_denied_response = res.error_401_unauthorized(
@@ -66,17 +44,23 @@ def isin_role(auth_roles, auth_way="or"):
         return wrapper
     return decorator
 
-def is_authenticated(func):
-    """TODO: add description"""
-    def wrapper(view, request, *args, **kwargs):
+
+def is_authenticated(func: Callable[[Any, Request], Any]) -> Any:
+    """
+    Checks, whether the user is authenticated. 
+    It returns an 401-unauthorized Response, of the user is not authenticated.
+    Otherwise (if the user is authenticated) the view will be executed normally. 
+    """
+    def wrapper(view: Any, request: Request, *args, **kwargs) -> Any:
         if request.user.is_authenticated: return func(view, request, *args, **kwargs)
         return res.error_401_unauthorized({"detail": "Authentication credentials were not provided."})
     return wrapper 
 
-def validate_composite_primary_keys(db_model, *keys):
+
+def validate_composite_primary_keys(db_model: Model, *keys) -> Any:
     """TODO: add description"""
-    def decorator(func):
-        def wrapper(view, request, *args, **kwargs):
+    def decorator(func: Callable[[Any, Request], Any]) -> Any:
+        def wrapper(view: Any, request: Request, *args, **kwargs) -> Any:
             db_key_value_map = {}
             for key in request.data:
                 value = request.data[key]

@@ -1,6 +1,9 @@
-"""TODO: add description"""
+"""
+DB Models: BlogPost and BlogPostComment.
+"""
 
 from datetime import datetime
+
 from django.db import models
 from django.conf import settings
 
@@ -19,7 +22,7 @@ class BlogPostModel(models.Model):
     last_edit = models.DateTimeField(auto_now=True, null=False)
 
     def __str__(self):
-        """returns model as string"""
+        """Returns model as string"""
         return f"title: {self.title[:5]}... | Content: {self.content[:10]}..."
 
 
@@ -46,5 +49,5 @@ class BlogPostCommentModel(models.Model):
     last_edit = models.DateTimeField(auto_now=True, null=False)
 
     def __str__(self):
-        """returns model as string"""
+        """Returns model as string"""
         return f"{self.content[:8]}..."

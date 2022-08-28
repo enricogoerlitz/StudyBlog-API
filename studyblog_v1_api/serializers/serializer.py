@@ -1,4 +1,8 @@
-"""TODO: add description"""
+"""
+Module for handling serializing models to JSON objects.
+"""
+
+from typing import Union, Any
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import QuerySet, Model
@@ -8,8 +12,11 @@ from django.contrib.auth.models import AbstractBaseUser
 from studyblog_v1_api.utils import type_check
 
 
-def model_to_json(model, *fields, **kwargs):
-    """TODO: add description"""
+def model_to_json(model: Union[QuerySet, Model, AbstractBaseUser], *fields, **kwargs) -> Any:
+    """
+    Serialize a QuerySet or a DB-Model to a JSON object. 
+    Raises an Value error, when the wrong type of data is passed as model.
+    """
     if not isinstance(model, (QuerySet, Model, AbstractBaseUser)):
         raise ValueError("Detected an unexpected model type by parsing the model to JSON.")
 
@@ -28,5 +35,3 @@ def model_to_json(model, *fields, **kwargs):
     if len(models) == 0: raise ObjectDoesNotExist("Object does not exists.")
 
     return models[0]
-    
-

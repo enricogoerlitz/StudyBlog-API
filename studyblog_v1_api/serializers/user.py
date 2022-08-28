@@ -1,4 +1,8 @@
-"""TODO: add description"""
+"""
+Module for handling UserProfile, Role and UserRole serializer.
+"""
+
+from typing import Any
 
 from rest_framework.serializers import ModelSerializer
 
@@ -14,7 +18,7 @@ from studyblog_v1_api.models import (
 
 
 class UserProfileSerializer(ModelSerializer):
-    """Serializes a UserProfileModel"""
+    """Serializes a UserProfileModel."""
 
     class Meta:
         model = UserProfileModel
@@ -26,8 +30,8 @@ class UserProfileSerializer(ModelSerializer):
             }
         }
     
-    def update(self, instance, validated_data):
-        """Handle updating an user"""
+    def update(self, instance: UserProfileModel, validated_data: dict[str, Any]):
+        """Handle updating an user."""
         if DB_FIELD_PASSWORD in validated_data:
             instance.set_password(validated_data.pop(DB_FIELD_PASSWORD))
         
@@ -35,7 +39,7 @@ class UserProfileSerializer(ModelSerializer):
 
 
 class RoleSerializer(ModelSerializer):
-    """Serialize RoleModel"""
+    """Serialize RoleModel."""
 
     class Meta:
         model = RoleModel
@@ -43,7 +47,7 @@ class RoleSerializer(ModelSerializer):
 
 
 class UserRoleSerializer(ModelSerializer):
-    """Serialize an UserRoleModel"""
+    """Serialize an UserRoleModel."""
 
     class Meta:
         model = UserRoleModel

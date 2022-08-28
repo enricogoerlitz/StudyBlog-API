@@ -1,9 +1,16 @@
-"""TODO: add description"""
+# mypy: ignore-errors
+"""
+Service for handling UserProfile operations.
+"""
+
+from typing import Any, Union
 
 from django.core.exceptions import ObjectDoesNotExist
 
+from rest_framework.request import Request
+
 from studyblog_v1_api.db import query, filter, roles
-from studyblog_v1_api.utils.exceptions import UnauthorizedException
+from studyblog_v1_api.utils.exceptions import UnauthorizedException, NotAuthenticatedException
 from studyblog_v1_api.serializers import serializer 
 from studyblog_v1_api.services import role_service
 from studyblog_v1_api.utils import type_check
@@ -18,18 +25,21 @@ from studyblog_v1_api.models import (
 )
 
 
-def create_user(request, validated_data):
-    """Handle creating a new user"""
+def create_user(request: Request, validated_data: dict[str, Any]) -> dict[str, Any]:
+    """
+    Handle creating a new user.
+    Raises an UnauthorizedException, if a the user is not an admin.
+    Raises ValueError, if the passed role_id is not an int or list/tuple.
+    Raises ObjectDoesNotExist exception, if a role does not exists.
+    Raises Exception if teh user could not be created.
+    """
     passed_user_role_ids = request.data.get(DB_FIELD_ROLE_ID)
     user_roles = []
     
-    if passed_user_role_ids and not is_authenticated(request):
+    if passed_user_role_ids and not isin_role(roles.ADMIN, request=request):
         raise UnauthorizedException("It was passed role data, but only admins can set role data.")
         
-    if (
-        passed_user_role_ids and
-        isin_role(roles.ADMIN, request=request)
-    ):
+    if passed_user_role_ids:
         role_service.validate_role(passed_user_role_ids)
         if type_check.is_list_or_tuple(passed_user_role_ids):
             user_roles = list(passed_user_role_ids)
@@ -50,8 +60,13 @@ def create_user(request, validated_data):
     
     return serializer.model_to_json(created_user, DB_FIELD_ID, DB_FIELD_USERNAME)
 
-def get_item_list(request):
-    """TODO: add description"""
+
+def get_item_list(request: Request) -> list[dict[str, Any]]:
+    """
+    Returns a list of UserProfiles.
+    If the request query params contains the param 'details=true', it returns a list of UserProfiles with details (user roles).
+    Otherwise only the UserProfile data.
+    """
     user_ids = _get_req_user_ids(request)
 
     if not filter.is_details(request):
@@ -63,8 +78,13 @@ def get_item_list(request):
     return _get_user_objs(users_data)
 
 
-def get_item(request, pk):
-    """TODO: add description"""
+def get_item(request: Request, pk: int) -> dict[str, Any]:
+    """
+    Returns an serialized UserProfile object.
+    Raises an ObjectDoesNotExist exception, if the object does not existing.
+    If the request query params contains the param 'details=true', it returns the UserProfile with details (user roles).
+    Otherwise only the UserProfile data.
+    """
     if not filter.is_details(request):
         return serializer.model_to_json(UserProfileModel.objects.get(id=pk), DB_FIELD_ID, DB_FIELD_USERNAME)
     
@@ -74,12 +94,18 @@ def get_item(request, pk):
     return _get_user_objs(user_data)[0]
 
 
-def is_authenticated(request):
-    """TODO: add description"""
+def is_authenticated(request: Request) -> bool:
+    """Returns whether the user is authenticated or not."""
     return request.user.is_authenticated
 
-def isin_role(auth_roles, request=None, id=None, auth_way="or"):
-    """TODO: add description"""
+
+def isin_role(auth_roles: Union[int, list[int], tuple[int]], request: Request = None, id: int = None, auth_way: str = "or") -> bool:
+    """
+    Returns whether the user is in the passed roles or not
+    Raises ValueError
+    Raises TypeError
+    Raises NotAuthenticatedException
+    """
     _validate_isin_role_inputs(auth_roles, request, id, auth_way)
 
     id = id if id else request.user.id
@@ -103,8 +129,9 @@ def isin_role(auth_roles, request=None, id=None, auth_way="or"):
     if auth_roles in user_roles: return True
     return False
 
-def _get_user_objs(users_data):
-    """TODO: add description"""
+
+def _get_user_objs(users_data: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Returns a prepared list of detailed UserProfiles."""
     result = []
     added_users = dict()
     for row in users_data:
@@ -117,8 +144,9 @@ def _get_user_objs(users_data):
         result[added_users[user_id]]["roles"].append(row["role_name"])
     return result
 
-def _get_user_obj(user_data):
-    """TODO: add description"""
+
+def _get_user_obj(user_data: dict[str, Any]) -> dict[str, Any]:
+    """Returns a detailed BlogPost object."""
     return {
         "id": user_data["id"],
         "username": user_data["username"],
@@ -127,13 +155,14 @@ def _get_user_obj(user_data):
         "roles": [] if not user_data["role_name"] else [user_data["role_name"]],
     }
 
-def _validate_isin_role_inputs(auth_roles, request, id, auth_way):
-    """if id is passed, the request will be ignored and it is not necessary to validate the authentication"""
+
+def _validate_isin_role_inputs(auth_roles: Union[int, list[int], tuple[int]], request: Request, id: int, auth_way: str) -> None:
+    """If id is passed, the request will be ignored and it is not necessary to validate the authentication"""
     if not id and not request:
         raise ValueError("You need to pass an request or an user id.")
 
     if not id and not is_authenticated(request):
-        raise Exception("User is not authenticated!")
+        raise NotAuthenticatedException("User is not authenticated!")
 
     if not auth_roles:
         raise ValueError("You need to pass any roles to this function.")
@@ -147,8 +176,12 @@ def _validate_isin_role_inputs(auth_roles, request, id, auth_way):
     elif not isinstance(auth_roles, str):
         raise TypeError("No valid roles passed. Please pass one role as string or multiple roles as list of strings.")
 
-def _get_req_user_ids(request):
-    """TODO: add description"""
+
+def _get_req_user_ids(request: Request) -> Union[int, list[int]]:
+    """
+    Extract the user_ids from the request
+    Raises ValueError
+    """
     user_ids = request.query_params.get("user_id")
     if not user_ids: return None
 
@@ -156,4 +189,5 @@ def _get_req_user_ids(request):
     for id in user_ids:
         if not type_check.is_int(id, or_float=False):
             raise ValueError(f"The passed id {id} is invalid!")
+
     return user_ids if len(user_ids) > 1 else user_ids[0]

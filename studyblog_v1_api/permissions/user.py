@@ -1,6 +1,13 @@
-"""TODO: add description"""
+"""
+Module for handling UserProfile, Role and UserRole permissions.
+"""
+
+from typing import Any
+
+from django.db.models import Model
 
 from rest_framework.permissions import BasePermission
+from rest_framework.request import Request
 
 from studyblog_v1_api.db import query, roles
 from studyblog_v1_api.services import user_service
@@ -26,8 +33,8 @@ class UserProfilePermission(BasePermission):
 
     """
 
-    def has_object_permission(self, request, view, obj):
-        """TODO: add description"""
+    def has_object_permission(self, request: Request, view: Any, obj: Model) -> Any:
+        """Handles GET, PUT, PATCH and DELETE access on a specific object."""
         if request.method == GET:
             return True
 
@@ -46,12 +53,12 @@ class UserRolePermission(BasePermission):
             - can do nothing on this route
     """
 
-    def has_permission(self, request, view):
-        """TODO: add description"""
+    def has_permission(self, request: Request, view: Any) -> Any:
+        """Handles GET and POST access."""
         return False if request.method == GET and not user_service.isin_role(roles.ADMIN, request=request) else True
 
-    def has_object_permission(self, request, view, obj):
-        """TODO: add description"""
+    def has_object_permission(self, request: Request, view: Any, obj: Model) -> Any:
+        """Handles GET, PUT, PATCH and DELETE access on a specific object."""
         if not user_service.isin_role(roles.ADMIN, request=request):
             return False
 
@@ -74,12 +81,12 @@ class RolePermission(BasePermission):
             - can do nothing on this route
     """
     
-    def has_permission(self, request, view):
-        """TODO: add description"""
+    def has_permission(self, request: Request, view: Any) -> Any:
+        """Handles GET and POST access."""
         return False if request.method == GET and not user_service.isin_role(roles.ADMIN, request=request) else True
     
-    def has_object_permission(self, request, view, obj):
-        """TODO: add description"""
+    def has_object_permission(self, request: Request, view: Any, obj: Model) -> Any:
+        """Handles GET, PUT, PATCH and DELETE access on a specific object."""
         if not user_service.isin_role(roles.ADMIN, request=request):
             return False
 

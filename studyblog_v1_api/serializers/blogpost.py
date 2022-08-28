@@ -1,4 +1,6 @@
-"""TODO: add description"""
+"""
+Module for handling BlogPost serializer.
+"""
 
 from rest_framework.serializers import ModelSerializer
 

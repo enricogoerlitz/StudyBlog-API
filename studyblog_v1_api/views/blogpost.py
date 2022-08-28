@@ -1,4 +1,6 @@
-"""TODO: add description"""
+"""
+API-Endpoints for BlogPost and BlogPostComment models.
+"""
 
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -21,7 +23,11 @@ class BlogPostViewSet(ModelViewSet):
     permission_classes = (IsAuthenticated, BlogPostPermission,)
 
     def list(self, request, *args, **kwargs):
-        """TODO: add description"""
+        """
+        Handle GET requests.
+        /api/v1/blogpost/
+        /api/v1/blogpost/?details=true&blogpost_id=1,2,4
+        """
         try:
             result = blogpost_service.get_item_list(request)
             return res.success(result)
@@ -29,7 +35,11 @@ class BlogPostViewSet(ModelViewSet):
             return res.error_500_internal_server_error(exp)
     
     def retrieve(self, request, pk, *args, **kwargs):
-        """TODO: add description"""
+        """
+        Handle GET by ID requests.
+        /api/v1/blogpost/{id}
+        /api/v1/blogpost/{id}/details=true
+        """
         try:
             return res.success(blogpost_service.get_item(request, pk))
         except ObjectDoesNotExist:
@@ -38,12 +48,12 @@ class BlogPostViewSet(ModelViewSet):
             return res.error_500_internal_server_error(exp)
         
     def create(self, request, *args, **kwargs):
-        """TODO: add description"""
+        """Handle POST requests."""
         request.data["user"] = self.request.user.id
         return super().create(request, *args, **kwargs)
 
     def update(self, request, pk, *args, **kwargs):
-        """TODO: add description"""
+        """Handle PUT|PATCH requests."""
         try:
             updated_blogpost = blogpost_service.update_item(request, pk)
             return res.updated(updated_blogpost)
@@ -62,7 +72,11 @@ class BlogPostCommentViewSet(ModelViewSet):
     permission_classes = (IsAuthenticated, BlogPostPermission)
 
     def list(self, request, *args, **kwargs):
-        """TODO: add description"""
+        """
+        Handle GET requests.
+        /api/v1/blogpost-comment/
+        /api/v1/blogpost-comment/?details=true&blogpost_id=1,2,4
+        """
         try:
             result = blogpost_comment_service.get_item_list(request)
             return res.success(result)
@@ -70,7 +84,11 @@ class BlogPostCommentViewSet(ModelViewSet):
             return res.error_500_internal_server_error(exp)
     
     def retrieve(self, request, pk, *args, **kwargs):
-        """TODO: add description"""
+        """
+        Handle GET by ID requests.
+        /api/v1/blogpost-comment/{id}
+        /api/v1/blogpost-comment/{id}/details=true
+        """
         try:
             result = blogpost_comment_service.get_item(request, pk)
             return res.success(result)
@@ -80,7 +98,7 @@ class BlogPostCommentViewSet(ModelViewSet):
             return res.error_500_internal_server_error(exp)
     
     def update(self, request, pk, *args, **kwargs):
-        """TODO: add description"""
+        """Handle PUT|PATCH requests."""
         try:
             result = blogpost_comment_service.update_item(request, pk)
             return res.updated(result)

@@ -1,19 +1,23 @@
 """
-Module for custom db filter queries.
+Module for custom db filter.
 """
 
-from typing import Union
+from typing import Union, Any
+
+from rest_framework.request import Request
+
 from studyblog_v1_api.db import query
 from studyblog_v1_api.utils import type_check
 
 
-def is_details(request):
-    """TODO: add description"""
+def is_details(request: Request) -> bool:
+    """Return is passed 'details=true' to the request."""
     details = request.query_params.get("details")
     return False if not details or details.lower() != "true" else True
 
-def fetch_user_details(user_id=None) -> str:
-    """TODO: add description"""
+
+def fetch_user_details(user_id: Union[int, list, tuple] = None) -> str:
+    """Returns a SQL query, which is searching for a specific user or multiple users with details, by id."""
     
     base_user_details_query = """
         SELECT 
@@ -35,8 +39,9 @@ def fetch_user_details(user_id=None) -> str:
 
     return base_user_details_query
 
-def fetch_blogpost_details(blogpost_id=None) -> str:
-    """TODO: add description"""
+
+def fetch_blogpost_details(blogpost_id: Union[int, list, tuple] = None) -> str:
+    """Returns a SQL query, which is searching for a specific blogpost or multiple blogposts by id with details, ordered by created date."""
 
     base_blogpost_details_query = """
         SELECT 
@@ -92,8 +97,9 @@ def fetch_blogpost_details(blogpost_id=None) -> str:
 
     return f"{base_blogpost_details_query} {order_by_clause}"
 
-def fetch_user_roles(id) -> str:
-    """TODO: add description"""
+
+def fetch_user_roles(user_id: int) -> str:
+    """Returns a SQL query, which is searching for the roles of a specific user."""
 
     base_is_in_role_query = """
         SELECT 
@@ -108,17 +114,19 @@ def fetch_user_roles(id) -> str:
             u.id = 
     """
 
-    return f"{base_is_in_role_query}{id}"
+    return f"{base_is_in_role_query}{user_id}"
 
-def fetch_execute_user_roles(id) -> list[str]:
-    """TODO: add description"""
+
+def fetch_execute_user_roles(user_id: int) -> list[str]:
+    """Execute a SQL query, which is searching for the roles of a specific user and returns the user with them roles."""
     return query.execute(
-        fetch_user_roles(id), 
+        fetch_user_roles(user_id), 
         formatter_func=lambda _, result: [obj[0] for obj in result]
     )
 
-def fetch_blogpost_comment_details(comment_id=None) -> str:
-    """TODO: add description"""
+
+def fetch_blogpost_comment_details(comment_id: Union[int, list, tuple] = None) -> str:
+    """Returns a SQL query, which is searching for a specific blogpost-comment or multiple blogpost-comments by id with details"""
 
     base_blogpost_comment_query = """
         SELECT
@@ -145,8 +153,9 @@ def fetch_blogpost_comment_details(comment_id=None) -> str:
     
     return base_blogpost_comment_query
 
-def _add_IN_to_query(query, field: str, ids: Union[list, tuple]) -> str:
-    """TODO: add description"""
+
+def _add_IN_to_query(query: str, field: str, ids: Union[list, tuple, Any]) -> str:
+    """Returns a prepared SQL query. It adds multiple ids to a 'IN-Statement'."""
     multiple_IN_query = f"{query} WHERE {field} IN("
     for i, id in enumerate(ids):
         if i == 0:

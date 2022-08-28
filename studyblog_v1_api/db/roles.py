@@ -1,5 +1,5 @@
 """
-Module for role names as constants
+Module for role names as constants.
 """
 
 ADMIN = "admin"
