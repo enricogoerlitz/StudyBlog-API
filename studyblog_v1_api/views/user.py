@@ -1,12 +1,15 @@
-"""TODO: add description"""
+# mypy: ignore-errors
+"""
+API-Endpoints for UserProfile, Role, UserRole models.
+"""
 
-import requests # type: ignore
+import requests
 
 from django.db import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
 
 from rest_framework.response import Response
-
+from rest_framework.request import Request
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -21,6 +24,7 @@ from studyblog_v1_api.utils import response as res
 from studyblog_v1_api.utils.exceptions import UnauthorizedException
 from studyblog_v1_api.permissions import UserProfilePermission, UserRolePermission, RolePermission
 from studyblog_v1_api.services import role_service, user_service
+from studyblog_v1_api.db import filter
 from studyblog_v1_api.models import (
     UserProfileModel,
     UserRoleModel,
@@ -41,7 +45,7 @@ class UserViewSet(ModelViewSet):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (UserProfilePermission,)
 
-    def list(self, request, *args, **kwargs):
+    def list(self, request: Request, *args, **kwargs):
         """
         Handle GET requests.
         /api/v1/user/
@@ -53,7 +57,7 @@ class UserViewSet(ModelViewSet):
         except Exception as exp:
             return res.error_500_internal_server_error(exp)
 
-    def retrieve(self, request, pk, *args, **kwargs):
+    def retrieve(self, request: Request, pk: int, *args, **kwargs):
         """
         Handle GET by ID requests.
         /api/v1/user/{id}
@@ -67,7 +71,7 @@ class UserViewSet(ModelViewSet):
         except Exception as exp:
             return res.error_500_internal_server_error(exp)
     
-    def create(self, request, *args, **kwargs):
+    def create(self, request: Request, *args, **kwargs):
         """Handle POST requests."""
         serializer_ = self.serializer_class(data=request.data)
         if not serializer_.is_valid():
@@ -77,6 +81,24 @@ class UserViewSet(ModelViewSet):
             return res.created(result)
         except UnauthorizedException as exp:
             res.error_400_bad_request(exp)
+        except Exception as exp:
+            return res.error_500_internal_server_error(exp)
+
+
+class UserMeAPIView(APIView):
+    """API-Endpoint for receiving current user."""
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request: Request, *args, **kwargs):
+        """Handle GET requests"""
+        try:
+            if not filter.is_details(request):
+                request.GET._mutable = True
+                request.query_params["details"] = "true"
+                
+            result = user_service.get_item(request, request.user.id)
+            return res.success(result)
         except Exception as exp:
             return res.error_500_internal_server_error(exp)
 

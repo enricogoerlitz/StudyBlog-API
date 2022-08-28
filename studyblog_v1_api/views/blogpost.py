@@ -1,9 +1,11 @@
+# mypy: ignore-errors
 """
 API-Endpoints for BlogPost and BlogPostComment models.
 """
 
 from django.core.exceptions import ObjectDoesNotExist
 
+from rest_framework.request import Request
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -22,7 +24,7 @@ class BlogPostViewSet(ModelViewSet):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated, BlogPostPermission,)
 
-    def list(self, request, *args, **kwargs):
+    def list(self, request: Request, *args, **kwargs):
         """
         Handle GET requests.
         /api/v1/blogpost/
@@ -34,7 +36,7 @@ class BlogPostViewSet(ModelViewSet):
         except Exception as exp:
             return res.error_500_internal_server_error(exp)
     
-    def retrieve(self, request, pk, *args, **kwargs):
+    def retrieve(self, request: Request, pk: int, *args, **kwargs):
         """
         Handle GET by ID requests.
         /api/v1/blogpost/{id}
@@ -47,12 +49,12 @@ class BlogPostViewSet(ModelViewSet):
         except Exception as exp:
             return res.error_500_internal_server_error(exp)
         
-    def create(self, request, *args, **kwargs):
+    def create(self, request: Request, *args, **kwargs):
         """Handle POST requests."""
         request.data["user"] = self.request.user.id
         return super().create(request, *args, **kwargs)
 
-    def update(self, request, pk, *args, **kwargs):
+    def update(self, request: Request, pk: int, *args, **kwargs):
         """Handle PUT|PATCH requests."""
         try:
             updated_blogpost = blogpost_service.update_item(request, pk)
@@ -71,7 +73,7 @@ class BlogPostCommentViewSet(ModelViewSet):
     authentication_classes = (TokenAuthentication, )
     permission_classes = (IsAuthenticated, BlogPostPermission)
 
-    def list(self, request, *args, **kwargs):
+    def list(self, request: Request, *args, **kwargs):
         """
         Handle GET requests.
         /api/v1/blogpost-comment/
@@ -83,7 +85,7 @@ class BlogPostCommentViewSet(ModelViewSet):
         except Exception as exp:
             return res.error_500_internal_server_error(exp)
     
-    def retrieve(self, request, pk, *args, **kwargs):
+    def retrieve(self, request: Request, pk: int, *args, **kwargs):
         """
         Handle GET by ID requests.
         /api/v1/blogpost-comment/{id}
@@ -97,7 +99,7 @@ class BlogPostCommentViewSet(ModelViewSet):
         except Exception as exp:
             return res.error_500_internal_server_error(exp)
     
-    def update(self, request, pk, *args, **kwargs):
+    def update(self, request: Request, pk: int, *args, **kwargs):
         """Handle PUT|PATCH requests."""
         try:
             result = blogpost_comment_service.update_item(request, pk)

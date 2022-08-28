@@ -16,5 +16,6 @@ urlpatterns = [
     path("test/", views.TestAPIView.as_view()),
     path("login/", views.UserAuthTokenApiView.as_view()),
     path("login/visitor", views.VisitorAuthTokenApiView.as_view()),
+    path("user/me", views.UserMeAPIView.as_view()),
     path("", include(router.urls))
 ]
