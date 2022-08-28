@@ -1,7 +1,5 @@
 """TODO: add description"""
 
-from rest_framework import status
-
 from studyblog_v1_api.services import user_service
 from studyblog_v1_api.utils import response as res
 

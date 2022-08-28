@@ -4,7 +4,7 @@ from rest_framework.permissions import BasePermission
 
 from studyblog_v1_api.db import roles
 from studyblog_v1_api.services import user_service
-from studyblog_v1_api.utils.request import GET, POST
+from studyblog_v1_api.middleware.request import GET, POST
 
 
 class BlogPostPermission(BasePermission):

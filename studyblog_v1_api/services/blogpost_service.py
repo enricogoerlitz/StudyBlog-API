@@ -5,7 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from studyblog_v1_api.models import BlogPostModel
 from studyblog_v1_api.serializers import serializer
 from studyblog_v1_api.db import query, filter
-from studyblog_v1_api.utils.request import PUT
+from studyblog_v1_api.middleware.request import PUT
 
 
 def get_item_list(request):
