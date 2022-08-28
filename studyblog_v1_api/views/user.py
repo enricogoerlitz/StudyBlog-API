@@ -75,7 +75,7 @@ class UserViewSet(ModelViewSet):
         """Handle POST requests."""
         serializer_ = self.serializer_class(data=request.data)
         if not serializer_.is_valid():
-            return res.error_400_bad_request({"error": serializer_.errors})
+            return Response(serializer_.errors)
         try:
             result = user_service.create_user(request, serializer_.data)
             return res.created(result)
@@ -85,6 +85,10 @@ class UserViewSet(ModelViewSet):
             return res.error_400_bad_request("This username is still existing. Choose another one.")
         except Exception as exp:
             return res.error_500_internal_server_error(exp)
+    
+    # TODO: implement!
+    # def update(self, request, *args, **kwargs):
+    #     return super().update(request, *args, **kwargs)
 
 
 class UserMeAPIView(APIView):
