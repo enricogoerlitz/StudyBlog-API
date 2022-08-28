@@ -38,7 +38,7 @@ def get_id_obj(model, Serializer, auto_exe=True):
                 obj = model.objects.get(pk=id)
                 id_obj = Serializer(obj, many=False).data
 
-                if auto_exe: return Response(id_obj)
+                if auto_exe: return res.success(id_obj)
 
                 return func(view, request, ValidDataWrapper(id_obj), *args, **kwargs)
             except Exception:
