@@ -75,12 +75,14 @@ class UserViewSet(ModelViewSet):
         """Handle POST requests."""
         serializer_ = self.serializer_class(data=request.data)
         if not serializer_.is_valid():
-            res.error_400_bad_request({"error": serializer_.errors})
+            return res.error_400_bad_request({"error": serializer_.errors})
         try:
             result = user_service.create_user(request, serializer_.data)
             return res.created(result)
         except UnauthorizedException as exp:
-            res.error_400_bad_request(exp)
+            return res.error_400_bad_request(exp)
+        except IntegrityError:
+            return res.error_400_bad_request("This username is still existing. Choose another one.")
         except Exception as exp:
             return res.error_500_internal_server_error(exp)
 
@@ -96,7 +98,7 @@ class UserMeAPIView(APIView):
             if not filter.is_details(request):
                 request.GET._mutable = True
                 request.query_params["details"] = "true"
-                
+
             result = user_service.get_item(request, request.user.id)
             return res.success(result)
         except Exception as exp:

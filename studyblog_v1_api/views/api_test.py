@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from studyblog_v1_api.db import roles
+from studyblog_v1_api.utils import response as res
 from studyblog_v1_api.models import (
     RoleModel,
     UserProfileModel,
@@ -19,13 +20,17 @@ class TestAPIView(APIView):
     """Tests the API without any permissions."""
 
     def get(self, request, format=None):
-        init_db()
-        test_orm()
+        try:
+            init_db()
+            test_orm()
 
-        return Response({
-            "response": "successful", 
-            "message": "You successful send a request to this api! Use /v1/api/login to get your token or /v1/api/register to register and get your token.",
-        })
+            return Response({
+                "response": "successful", 
+                "db initialized": True,
+                "message": "You successful send a request to this api! Use /v1/api/login/ to get your token or /v1/api/user/ to register and get your token.",
+            })
+        except Exception as exp:
+            return res.error_400_bad_request(exp)
 
 
 def init_db():
