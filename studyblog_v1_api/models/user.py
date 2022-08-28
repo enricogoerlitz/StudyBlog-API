@@ -1,3 +1,5 @@
+"""TODO: add description"""
+
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 
@@ -47,6 +49,7 @@ class UserProfileModel(AbstractBaseUser, PermissionsMixin):
         return self.username
     
     def get_short_name(self):
+        """TODO: add description"""
         return f"{self.username[:5]}..."
     
     def __str__(self):
@@ -58,7 +61,6 @@ class UserProfileModel(AbstractBaseUser, PermissionsMixin):
 
 class RoleModel(models.Model):
     """DB Model for storing role names"""
-
     role_name = models.CharField(max_length=50, blank=False, unique=True)
 
     def __str__(self):

@@ -1,3 +1,5 @@
+"""TODO: add description"""
+
 from django.core.exceptions import ObjectDoesNotExist
 
 from studyblog_v1_api.models import BlogPostModel
@@ -12,6 +14,7 @@ from studyblog_v1_api.utils.request import PUT
 
 
 def get_item_list(request):
+    """TODO: add description"""
     if not filter.is_details(request):
         return serializer.model_to_json(BlogPostModel.objects.all())
     
@@ -22,6 +25,7 @@ def get_item_list(request):
 
 
 def get_item(request, pk):
+    """TODO: add description"""
     if not filter.is_details(request):
         return serializer.model_to_json(BlogPostModel.objects.get(id=pk))
 
@@ -32,6 +36,7 @@ def get_item(request, pk):
     
 
 def update_item(request, pk):
+    """TODO: add description"""
     title = request.data.get("title")
     content = request.data.get("content")
     if not title and not content:
@@ -45,6 +50,7 @@ def update_item(request, pk):
 
 
 def _get_blogpost_items(blogpost_data):
+    """TODO: add description"""
     result = []
     added_blogposts = {}
     added_comments = {}
@@ -76,6 +82,7 @@ def _get_blogpost_items(blogpost_data):
     return result
 
 def _get_blogpost_obj(data):
+    """TODO: add description"""
     return {
         "id": data["blogpost_id"],
         "title": data["blogpost_title"],
@@ -93,6 +100,7 @@ def _get_blogpost_obj(data):
     }
 
 def _get_blogpost_comment_obj(data):
+    """TODO: add description"""
     return {
         "id": data["comment_id"],
         "content": data["comment_content"],
@@ -110,6 +118,7 @@ def _get_blogpost_comment_obj(data):
 
 
 def _update_save_blogpost(blogpost, title, content):
+    """TODO: add description"""
     if title: blogpost.title = title
     if content: blogpost.content = content
     blogpost.save()

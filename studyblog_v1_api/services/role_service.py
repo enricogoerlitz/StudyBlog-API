@@ -1,3 +1,5 @@
+"""TODO: add description"""
+
 from django.core.exceptions import ObjectDoesNotExist
 from studyblog_v1_api.models.user import RoleModel
 
@@ -13,6 +15,7 @@ from studyblog_v1_api.models import (
 
 
 def create_item(request):
+    """TODO: add description"""
     user_id, role_id = _get_user_role_data(request)
 
     #_validate_existing(user_id, role_id)
@@ -23,6 +26,7 @@ def create_item(request):
     return serializer.model_to_json(new_user_role)
 
 def update_item(request, pk):
+    """TODO: add description"""
     user_id, role_id = _get_user_role_data(request)
     #_validate_existing(user_id, role_id)
 
@@ -34,6 +38,7 @@ def update_item(request, pk):
     return serializer.model_to_json(current_user_role)
 
 def validate_role(role_id):
+    """TODO: add description"""
     if type_check.is_int(role_id, or_float=False):
         if not RoleModel.objects.filter(id=role_id).exists():
             raise ObjectDoesNotExist(f"The role_id {role_id} does not exits.")
@@ -48,6 +53,7 @@ def validate_role(role_id):
 
     raise ValueError("Unexpected value as role_id.")
 def _get_user_role_data(request):
+    """TODO: add description"""
     user_id = request.data.get(DB_FIELD_USER)
     role_id = request.data.get(DB_FIELD_ROLE)
     _validate_data(user_id, role_id)
@@ -55,6 +61,7 @@ def _get_user_role_data(request):
     return user_id, role_id
 
 def _validate_data(user_id, role_id):
+    """TODO: add description"""
     if user_id and role_id: return
     if user_id is None and role_id:
         raise ValueError("The field user_id is required.")
@@ -65,6 +72,7 @@ def _validate_data(user_id, role_id):
     raise ValueError("The fields user_id and role_id are required.")
 
 def _validate_existing(user_id, role_id):
+    """TODO: add description"""
     is_existing = UserRoleModel.objects.filter(user_id=user_id, role_id=role_id).exists()
     if is_existing:
         error_msg = f"Duplicate Key Error. The user with the id {user_id} already has the role with the id {role_id}"

@@ -1,3 +1,4 @@
+"""TODO: add description"""
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
@@ -13,7 +14,6 @@ from studyblog_v1_api.models import (
 
 class TestAPIView(APIView):
     """Tests the API without any permissions"""
-    #authentication_classes = (TokenAuthentication,)
 
     def get(self, request, format=None):
         init_db()
@@ -25,7 +25,7 @@ class TestAPIView(APIView):
         })
 
 def init_db():
-    """"""
+    """TODO: add description"""
     # - - - - - - users - - - - - - 
     PASSWORD = "test"
     if not UserProfileModel.objects.filter(username="teddy").exists():
@@ -152,6 +152,7 @@ def init_db():
         
     
 def test_orm():
+    """TODO: add description"""
     qs = UserRoleModel.objects.all().select_related("user", "role")
     print("- - - - - - - - TEST ORM START- - - - - - - -")
     print(qs.query)

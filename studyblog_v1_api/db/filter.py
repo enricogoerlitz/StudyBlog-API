@@ -10,6 +10,7 @@ from studyblog_v1_api.utils import type_check
 
 
 def is_details(request):
+    """TODO: add description"""
     details = request.query_params.get("details")
     return False if not details or details.lower() != "true" else True
 
@@ -27,6 +28,7 @@ base_user_details_query = """
 
 
 def fetch_user_details(user_id=None) -> str:
+    """TODO: add description"""
     # TODO: more details
     if type_check.is_int(user_id):
         single_user_query = f"{base_user_details_query} WHERE ur.user_id = {user_id}"
@@ -96,6 +98,7 @@ base_blogpost_details_query = """
 
 
 def fetch_blogpost_details(blogpost_id=None) -> str:
+    """TODO: add description"""
     # TODO: more details
     order_by_clause = "ORDER BY bp.created"
     
@@ -124,10 +127,12 @@ base_is_in_role_query = """
 """
 
 def fetch_user_roles(id) -> str:
+    """TODO: add description"""
     return f"{base_is_in_role_query}{id}"
 
 
 def fetch_execute_user_roles(id) -> list[str]:
+    """TODO: add description"""
     return query.execute(
         fetch_user_roles(id), 
         formatter_func=lambda _, result: [obj[0] for obj in result]
@@ -152,6 +157,7 @@ base_blogpost_comment_query = """
 """
 
 def fetch_blogpost_comment_details(comment_id=None) -> str:
+    """TODO: add description"""
     if type_check.is_int(comment_id):
         return f"{base_blogpost_comment_query} WHERE bpc.id = {comment_id}"
     
@@ -164,6 +170,7 @@ def fetch_blogpost_comment_details(comment_id=None) -> str:
 
 
 def _add_IN_to_query(query, field: str, ids: Union[list, tuple]) -> str:
+    """TODO: add description"""
     multiple_IN_query = f"{query} WHERE {field} IN("
     for i, id in enumerate(ids):
         if i == 0:

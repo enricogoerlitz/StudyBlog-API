@@ -1,3 +1,5 @@
+"""TODO: add description"""
+
 from django.core.exceptions import ObjectDoesNotExist
 
 from studyblog_v1_api.db import query, filter, roles
@@ -48,6 +50,7 @@ def create_user(request, validated_data):
     return serializer.model_to_json(created_user, DB_FIELD_ID, DB_FIELD_USERNAME)
 
 def get_item_list(request):
+    """TODO: add description"""
     user_ids = _get_req_user_ids(request)
 
     if not filter.is_details(request):
@@ -60,6 +63,7 @@ def get_item_list(request):
 
 
 def get_item(request, pk):
+    """TODO: add description"""
     if not filter.is_details(request):
         return serializer.model_to_json(UserProfileModel.objects.get(id=pk), DB_FIELD_ID, DB_FIELD_USERNAME)
     
@@ -70,13 +74,11 @@ def get_item(request, pk):
 
 
 def is_authenticated(request):
+    """TODO: add description"""
     return request.user.is_authenticated
 
-def is_role_valid(role):
-
-    pass
-
 def isin_role(auth_roles, request=None, id=None, auth_way="or"):
+    """TODO: add description"""
     _validate_isin_role_inputs(auth_roles, request, id, auth_way)
 
     id = id if id else request.user.id
@@ -101,6 +103,7 @@ def isin_role(auth_roles, request=None, id=None, auth_way="or"):
     return False
 
 def _get_user_objs(users_data):
+    """TODO: add description"""
     result = []
     added_users = dict()
     for row in users_data:
@@ -114,6 +117,7 @@ def _get_user_objs(users_data):
     return result
 
 def _get_user_obj(user_data):
+    """TODO: add description"""
     return {
         "id": user_data["id"],
         "username": user_data["username"],
@@ -143,6 +147,7 @@ def _validate_isin_role_inputs(auth_roles, request, id, auth_way):
         raise TypeError("No valid roles passed. Please pass one role as string or multiple roles as list of strings.")
 
 def _get_req_user_ids(request):
+    """TODO: add description"""
     user_ids = request.query_params.get("user_id")
     if not user_ids: return None
 

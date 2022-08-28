@@ -1,3 +1,5 @@
+"""TODO: add description"""
+
 from rest_framework.permissions import BasePermission
 
 from studyblog_v1_api.db import query, roles
@@ -26,13 +28,13 @@ class UserProfilePermission(BasePermission):
     """
 
     def has_object_permission(self, request, view, obj):
-        if request.method in [GET, POST]:
+        """TODO: add description"""
+        if request.method == GET:
             return True
 
-        if request.method in [PUT, PATCH, DELETE]:
-            if user_service.isin_role(roles.ADMIN, request=request):
-                return not user_service.isin_role(roles.ADMIN, id=obj.id)
-            return obj.id == request.user.id
+        if user_service.isin_role(roles.ADMIN, request=request):
+            return not user_service.isin_role(roles.ADMIN, id=obj.id)
+        return obj.id == request.user.id
         
 
 class UserRolePermission(BasePermission):
@@ -46,20 +48,21 @@ class UserRolePermission(BasePermission):
     """
 
     def has_permission(self, request, view):
-        return False if request.method == "GET" and not user_service.isin_role(roles.ADMIN, request=request) else True
+        """TODO: add description"""
+        return False if request.method == GET and not user_service.isin_role(roles.ADMIN, request=request) else True
 
     def has_object_permission(self, request, view, obj):
+        """TODO: add description"""
         if not user_service.isin_role(roles.ADMIN, request=request):
             return False
 
-        if request.method in [GET, POST]:
+        if request.method == GET:
             return True
         
-        if request.method in [PUT, PATCH, DELETE]:
-            admin_id = query.execute(f"""
-                SELECT id FROM studyblog_v1_api_rolemodel WHERE role_name = '{roles.ADMIN}'
-            """)[0]["id"]
-            return not obj.role_id == admin_id
+        admin_id = query.execute(f"""
+            SELECT id FROM studyblog_v1_api_rolemodel WHERE role_name = '{roles.ADMIN}'
+        """)[0]["id"]
+        return not obj.role_id == admin_id
 
 
 class RolePermission(BasePermission):
@@ -73,14 +76,15 @@ class RolePermission(BasePermission):
     """
     
     def has_permission(self, request, view):
-        return False if request.method == "GET" and not user_service.isin_role(roles.ADMIN, request=request) else True
+        """TODO: add description"""
+        return False if request.method == GET and not user_service.isin_role(roles.ADMIN, request=request) else True
     
     def has_object_permission(self, request, view, obj):
+        """TODO: add description"""
         if not user_service.isin_role(roles.ADMIN, request=request):
             return False
 
-        if request.method in ["GET", "POST"]:
+        if request.method == GET:
             return True
         
-        if request.method in ["PUT", "PATCH", "DELETE"]:
-            return not obj.role_name in [roles.ADMIN, roles.STUDENT, roles.VISITOR]
+        return not obj.role_name in [roles.ADMIN, roles.STUDENT, roles.VISITOR]

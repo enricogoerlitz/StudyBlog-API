@@ -1,14 +1,15 @@
+"""TODO: add description"""
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import QuerySet, Model
 from django.forms.models import model_to_dict
 from django.contrib.auth.models import AbstractBaseUser
 
-
-
 from studyblog_v1_api.utils import type_check
 
 
 def model_to_json(model, *fields, **kwargs):
+    """TODO: add description"""
     if not isinstance(model, (QuerySet, Model, AbstractBaseUser)):
         raise ValueError("Detected an unexpected model type by parsing the model to JSON.")
 

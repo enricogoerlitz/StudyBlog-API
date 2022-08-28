@@ -1,3 +1,5 @@
+"""TODO: add description"""
+
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -55,9 +57,8 @@ def get_id_obj(model, Serializer, auto_exe=True):
     return decorator
 
 def isin_role(auth_roles, auth_way="or"): 
-    """Decorator
-    
-    """
+    """TODO: add description"""
+
     def decorator(func):
         def wrapper(view, request, *args, **kwargs):
             isin_result = user_service.isin_role(auth_roles, request, auth_way=auth_way)
@@ -69,7 +70,7 @@ def isin_role(auth_roles, auth_way="or"):
 
                 
 def is_authenticated(func):
-    """TODO: comment"""
+    """TODO: add description"""
     def wrapper(view, request, *args, **kwargs):
         if request.user.is_authenticated:
             return func(view, request, *args, **kwargs)
@@ -79,6 +80,7 @@ def is_authenticated(func):
 
 
 def validate_composite_primary_keys(db_model, *keys):
+    """TODO: add description"""
     def decorator(func):
         def wrapper(view, request, *args, **kwargs):
             db_key_value_map = {}

@@ -1,7 +1,16 @@
+"""TODO: add description"""
+
+# mypy: ignore-errors
+
+import requests
+
 from django.db import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
 
+from rest_framework.response import Response
+
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.views import APIView
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.settings import api_settings
@@ -19,7 +28,6 @@ from studyblog_v1_api.models import (
     UserProfileModel,
     UserRoleModel,
     RoleModel,
-    DB_FIELD_USERNAME,
     DB_FIELD_ROLE_NAME,
 )
 from studyblog_v1_api.serializers import (
@@ -33,12 +41,11 @@ class UserViewSet(ModelViewSet):
     """Handle creating, updating and filtering profiles"""
     serializer_class = UserProfileSerializer
     queryset = UserProfileModel.objects.all()
-    permission_classes = (UserProfilePermission,)
     authentication_classes = (TokenAuthentication,)
-    filter_backends = (SearchFilter,)
-    search_fields = (DB_FIELD_USERNAME,)
+    permission_classes = (UserProfilePermission,)
 
     def retrieve(self, request, pk, *args, **kwargs):
+        """TODO: add description"""
         try:
             result = user_service.get_item(request, pk)
             return res.success(result)
@@ -59,6 +66,7 @@ class UserViewSet(ModelViewSet):
             return res.error_500_internal_server_error(exp)
     
     def create(self, request, *args, **kwargs):
+        """TODO: add description"""
         serializer_ = self.serializer_class(data=request.data)
         if not serializer_.is_valid():
             res.error_400_bad_request({"error": serializer_.errors})
@@ -74,21 +82,31 @@ class UserAuthTokenApiView(ObtainAuthToken):
     renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
 
 
+class VisitorAuthTokenApiView(APIView):
+    """TODO: add description"""
+
+    def get(self, request, *args, **kwargs):
+        base_url = request.build_absolute_uri().replace("visitor", "")
+        res = requests.post(base_url, {"username": "visitor", "password": "test"})
+        token = res.json()
+        return Response(token, status=res.status_code)
+
+
 class RoleViewSet(ModelViewSet):
     """TODO: add description"""
-    authentication_classes = (TokenAuthentication, )
     serializer_class = RoleSerializer
     queryset = RoleModel.objects.all()
-    permission_classes = (IsAuthenticated, RolePermission)
     filter_backends = (SearchFilter,)
     search_fields = (DB_FIELD_ROLE_NAME,)
+    authentication_classes = (TokenAuthentication, )
+    permission_classes = (IsAuthenticated, RolePermission)
 
 
 class UserRoleViewSet(ModelViewSet):
     """TODO: add description"""
-    authentication_classes = (TokenAuthentication,)
     serializer_class = UserRoleSerializer
     queryset = UserRoleModel.objects.all()
+    authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated, UserRolePermission)
 
     @validate_composite_primary_keys(UserRoleModel, "user", "role")

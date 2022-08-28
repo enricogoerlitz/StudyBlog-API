@@ -1,3 +1,5 @@
+"""TODO: add description"""
+
 from django.core.exceptions import ObjectDoesNotExist
 
 from studyblog_v1_api.models import BlogPostCommentModel
@@ -6,6 +8,7 @@ from studyblog_v1_api.db import query, filter
 
 
 def get_item_list(request):
+    """TODO: add description"""
     if not filter.is_details(request):
         return serializer.model_to_json(BlogPostCommentModel.objects.all())
     
@@ -15,6 +18,7 @@ def get_item_list(request):
     return _get_blogpost_comment_items(blogpost_comment_data)
 
 def get_item(request, pk):
+    """TODO: add description"""
     if not filter.is_details(request):
         return serializer.model_to_json(BlogPostCommentModel.objects.get(id=pk))
 
@@ -24,6 +28,7 @@ def get_item(request, pk):
     return _get_comment_obj(blogpost_comment_data[0])
 
 def update_item(request, pk):
+    """TODO: add description"""
     content = request.data.get("content")
     if not content:
         raise ValueError("Field content is required.")
@@ -35,6 +40,7 @@ def update_item(request, pk):
     return serializer.model_to_json(current_blogpost_comment)
 
 def _get_blogpost_comment_items(blogpost_comment_data):
+    """TODO: add description"""
     result = []
     added_comments = {}
     for row in blogpost_comment_data:
@@ -49,6 +55,7 @@ def _get_blogpost_comment_items(blogpost_comment_data):
     return result
 
 def _get_comment_obj(data):
+    """TODO: add description"""
     return {
         "id": data["id"],
         "content": data["content"],

@@ -1,3 +1,5 @@
+"""TODO: add description"""
+
 from rest_framework.serializers import ModelSerializer
 
 from studyblog_v1_api.models import (
